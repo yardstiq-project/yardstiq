@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yardstiq"
+version = "0.1.1"
+description = "CLI tool to run benchmark over QPUs"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+]
+
+dependencies = [
+    "typer[all]",
+    "platformdirs",
+    "toml",
+    "keyring",
+    "qio",
+]
+
+[project.scripts]
+ys = "yardstiq.cli.main_cli:app"
+
+[project.urls]
+Repository = "https://github.com/yardstiq-project/yardstiq"
+
+
+[tool.setuptools_scm]
