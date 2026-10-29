@@ -16,6 +16,7 @@ app = typer.Typer(
 app.add_typer(tool_cli)
 
 
+
 @app.command("run")
 def run(
     problem: str = typer.Argument(
@@ -38,7 +39,10 @@ def run(
     ),
     debug: Optional[bool] = typer.Option(
         False, "--debug", help="Option to print log info"
-    )
+    ),
+    remote: Optional[bool] = typer.Option(
+        False, "--remote", help="Option to run the workflow remotely on a server"
+    ),
     ):
     """Take a specific problem with a dataset and a QPU/EMU to run an instance.
         E.g.: ys run maxcut aqora-maxcut-01 qiskit-aer -c 'max-shot 10000 max-duration 10000 ...' """
@@ -51,10 +55,10 @@ def run(
     parsed_config = config_parser(config)
     debug_print(f"Config used : {parsed_config}" if config else f"Using default config : {parsed_config}", True)
 
-    workflow = load_manager(parsed_instance, parsed_config)
-    debug_print(f"Workflow created : {workflow}", debug)
+    workflow_info = load_manager(parsed_instance, parsed_config)
+    debug_print(f"Workflow created : {workflow_info}", debug)
 
-    workflow_run = engine_manager(workflow, pipeline)
+    workflow_run = engine_manager(workflow_info, pipeline)
     debug_print(f"Workflowrun executed : {workflow_run}", debug)
 
     #submission manager part
