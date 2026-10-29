@@ -23,6 +23,8 @@ dependencies = [
     "toml",
     "keyring",
     "qio",
+    "qiskit",
+    "pytest",
 ]
 
 [project.scripts]
