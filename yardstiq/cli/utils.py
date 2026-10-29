@@ -21,3 +21,9 @@ def config_parser(raw : Optional[str]) -> Config:
             parsed_config[key] = value
     
     return Config.from_dict(parsed_config)
+
+
+def debug_print(msg : str, debug : bool):
+    """Function to print debug message if debug is True"""
+    if debug:
+        typer.echo(msg)

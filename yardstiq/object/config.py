@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field, fields
 import warnings
+import typer
 
 @dataclass(frozen=True)
 class Config:
@@ -33,11 +34,14 @@ class Config:
 
             if key in valid:
                 if key != "compilation_parameters":
-                    filtered[key] = int(val)
+                    try:
+                        filtered[key] = int(val)
+                    except ValueError:
+                        raise typer.BadParameter(f"Config parameter {key} must be an integer, got {val}")
                 else: 
                     # This part needs further discussions
                     filtered[key] = val
             else:
                 warnings.warn(f"Passed config parameter is not supported: {key}")
         return self(**filtered)
-            
+

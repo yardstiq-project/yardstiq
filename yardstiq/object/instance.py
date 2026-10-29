@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from .config import Config
 import typer
 
-PROBLEM_LIST = ["maxcut", ""]
+PROBLEM_LIST = ["maxcut", "tsp", "vqe"]
 
 @dataclass(frozen=True)
 class Instance:
@@ -17,12 +17,7 @@ class Instance:
     dataset : str
     qpu : str
 
-    def __init__(self, problem : str, dataset: str, qpu :str):
-
-        if not problem in PROBLEM_LIST:
-            raise typer.BadParameter(f"problem {problem} is not supported. List of supported problems : {PROBLEM_LIST} ")
-        
-        self.problem = problem
-        self.dataset = dataset
-        self.qpu = qpu
+    def __post_init__(self):
+        if not self.problem in PROBLEM_LIST:
+            raise typer.BadParameter(f"problem {self.problem} is not supported. List of supported problems : {PROBLEM_LIST} ")
 
