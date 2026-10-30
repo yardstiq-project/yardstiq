@@ -5,7 +5,7 @@ from yardstiq.object.dataset import Dataset
 
 import json
 
-def load_manager(
+def create_workflow(
         instance : Instance,
         config : Config
 ) -> Workflow:

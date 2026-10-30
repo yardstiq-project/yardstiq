@@ -1,9 +1,9 @@
 import typer
 from typing import Optional
 from yardstiq.object.instance import Instance
-from yardstiq.core.load_manager import load_manager
-from yardstiq.core.engine_manager import engine_manager
-from .utils import config_parser, debug_print
+from yardstiq.core.create_workflow import create_workflow
+from yardstiq.core.create_workflowrun import create_workflowrun
+from .utils import create_config, debug_print
 from .tool import tool_cli
 
 
@@ -48,13 +48,13 @@ def run(
     parsed_instance = Instance(problem, dataset, qpu)
     debug_print(f"Instance parsed: {parsed_instance}", debug)
 
-    parsed_config = config_parser(config)
+    parsed_config = create_config(config)
     debug_print(f"Config used : {parsed_config}" if config else f"Using default config : {parsed_config}", True)
 
-    workflow = load_manager(parsed_instance, parsed_config)
+    workflow = create_workflow(parsed_instance, parsed_config)
     debug_print(f"Workflow created : {workflow}", debug)
 
-    workflow_run = engine_manager(workflow, pipeline)
+    workflow_run = create_workflowrun(workflow, pipeline)
     debug_print(f"Workflowrun executed : {workflow_run}", debug)
 
     #submission manager part
