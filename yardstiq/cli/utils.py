@@ -3,7 +3,7 @@ from yardstiq.object.config import Config
 from typing import Optional
 
 
-def config_parser(raw : Optional[str]) -> Config:
+def create_config(raw : Optional[str]) -> Config:
     """Function to parse config text into Config structure"""
     if not raw:
         return Config()
