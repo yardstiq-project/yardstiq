@@ -17,7 +17,8 @@ def create_workflow(
 
     #data = json.load(instance.dataset)
     data = json.load(open(f"{instance.dataset}"))
-    dataset = Dataset(instance.dataset, data)
+    dataset = Dataset(name=instance.dataset, hash=data["hash"], version=data["version"], content=data["content"])
+
     return WorkflowInfo(instance, config, dataset)
 
 

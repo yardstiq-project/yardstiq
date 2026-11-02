@@ -29,5 +29,6 @@ class WorkflowRun:
         result : Result of the execution
     """
     workflow: WorkflowInfo
-    circuit : str
+    flow : list
+    versions : dict
     result : any

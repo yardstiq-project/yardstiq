@@ -1,16 +1,16 @@
 from yardstiq.object.workflow import WorkflowInfo, WorkflowRun
-from yardstiq.object.engine_registry import EngineRegistry
+from yardstiq.sdk.engine import EngineRegistry
 
 
 
-def create_workflowrun(workflow : WorkflowInfo, pipeline : str) -> WorkflowRun:
+def create_workflowrun(workflow : WorkflowInfo, engine : str) -> WorkflowRun:
     """Function that take a workflow and uses a pipeline to run it. 
     Engine manager is just to dispatch the workflow to the pipeline.
 
     
     """
 
-    WorkflowRun = EngineRegistry[pipeline](workflow)
+    WorkflowRun = EngineRegistry[engine](workflow)
 
     return WorkflowRun
 

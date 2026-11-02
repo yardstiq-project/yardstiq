@@ -13,7 +13,7 @@ _RUN_CONFIG_VALUES = ["42", "A", "", "{'param1': 'value1', 'param2': 'value2'}",
 _RUN_PIPELINE = ["qall", ""]
 
 
-def _test_run_problem():
+def test_run_problem():
     for problem in _RUN_PROBLEM:
         try:
             runner.invoke(app, ["run", problem, "data_test.json", "qiskit-aer"])
@@ -21,7 +21,7 @@ def _test_run_problem():
             if not problem == "maxcut":
                 assert isinstance(e, typer.BadParameter) 
     
-def _test_run_dataset():
+def test_run_dataset():
     for dataset in _RUN_DATASET:
         try:
             runner.invoke(app, ["run", "maxcut", dataset, "qiskit-aer"])
@@ -29,7 +29,7 @@ def _test_run_dataset():
             if not dataset == "data_test.json":
                 assert isinstance(e, FileNotFoundError)
 
-def _test_run_qpu():
+def test_run_qpu():
     for qpu in _RUN_QPU:
         try:
             runner.invoke(app, ["run", "maxcut", "data_test.json", qpu])
@@ -37,7 +37,7 @@ def _test_run_qpu():
             if not qpu == "qiskit-aer":
                 assert isinstance(e, typer.BadParameter)
 
-def _test_run_config():
+def test_run_config():
     for config in _RUN_CONFIG:
         for value in _RUN_CONFIG_VALUES:
             try:
@@ -46,7 +46,7 @@ def _test_run_config():
                 if not (config == "max-shot" and value == "42"):
                     assert isinstance(e, typer.BadParameter)
 
-def _test_run_pipeline():
+def test_run_pipeline():
     for pipeline in _RUN_PIPELINE:
         try:
             runner.invoke(app, ["run", "maxcut", "data_test.json", "qiskit-aer", f"--pipeline {pipeline}"])
@@ -54,7 +54,7 @@ def _test_run_pipeline():
             if not pipeline == "qall":
                 assert isinstance(e, typer.BadParameter)
 
-def test_cli():
+def _test_cli():
     _test_run_problem()
     _test_run_dataset()
     _test_run_qpu() 

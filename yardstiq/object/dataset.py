@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-@dataclass
+@dataclass(frozen=True)
 class Dataset:
     """Dataset represents a collection of data that can be used for a problem
     

@@ -34,8 +34,8 @@ def run(
     estimate: Optional[bool] = typer.Option(
         False, "--estimate", "-e", help="Option to prevent from running problem and estimate ressources cost"
     ),
-    pipeline: Optional[str] = typer.Option(
-        "qall", "--pipeline", "-p", help="Option so declare which pipeline to use when running workflow"
+    engine: Optional[str] = typer.Option(
+        "qall", "--engine", help="Option so declare which pipeline to use when running workflow"
     ),
     debug: Optional[bool] = typer.Option(
         False, "--debug", help="Option to print log info"
@@ -58,10 +58,11 @@ def run(
     workflow = create_workflow(parsed_instance, parsed_config)
     debug_print(f"Workflow created : {workflow}", debug)
 
-    workflow_run = create_workflowrun(workflow, pipeline)
+    workflow_run = create_workflowrun(workflow, engine)
     debug_print(f"Workflowrun executed : {workflow_run}", debug)
 
     #submission manager part
+    typer.echo(f"Workflowrun executed : {workflow_run}")
 
 @app.command("login")
 def login():
