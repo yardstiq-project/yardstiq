@@ -46,7 +46,7 @@ class EngineRegistry:
     engines = {}
 
     @classmethod
-    def register_engine(cls, name, engine : Engine):
+    def register_engine(cls, name, engine : engine):
         cls.engines[name] = engine
 
     @classmethod
