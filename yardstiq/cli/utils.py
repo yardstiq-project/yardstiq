@@ -3,7 +3,7 @@ from yardstiq.object.config import Config
 from typing import Optional
 
 
-def create_config(raw : Optional[str]) -> Config:
+def create_config(raw : Optional[str], qpu : str) -> Config:
     """Function to parse config text into Config structure"""
     if not raw:
         return Config()
@@ -19,7 +19,8 @@ def create_config(raw : Optional[str]) -> Config:
             key = lst[i]
             value = lst[i + 1]
             parsed_config[key] = value
-    
+
+    parsed_config["hardware"] = qpu
     return Config.from_dict(parsed_config)
 
 

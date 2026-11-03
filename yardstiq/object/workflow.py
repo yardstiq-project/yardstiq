@@ -16,7 +16,6 @@ class WorkflowInfo:
     """
     instance : Instance
     config : Config
-    data : Dataset
 
 
 @dataclass(frozen=True)

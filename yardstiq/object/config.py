@@ -15,6 +15,7 @@ class Config:
         compilation_parameters : Other parameters needed for compilation
     """
 
+    hardware: str = "qiskit-aer"
     max_shot: int = 10000
     max_duration: int = 10000
     max_cost: int = 200
@@ -27,13 +28,12 @@ class Config:
         """Creates a config from a dict and ignore non used parameters"""
 
         valid = {key.name for key in fields(self)}
-        print(data)
         filtered = {}
         for raw_key, val in data.items():
             key = raw_key.replace('-', '_')
 
             if key in valid:
-                if key != "compilation_parameters":
+                if key != "compilation_parameters" and key != "hardware":
                     try:
                         filtered[key] = int(val)
                     except ValueError:
@@ -44,4 +44,3 @@ class Config:
             else:
                 warnings.warn(f"Passed config parameter is not supported: {key}")
         return self(**filtered)
-

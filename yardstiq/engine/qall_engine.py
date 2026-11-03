@@ -13,9 +13,9 @@ def quall_engine(workflow: WorkflowInfo) -> WorkflowRun:
     # get qall workflow
     # run qall workflow
 
-    algorithm = AlgorithmRegistry[workflow.instance.problem](workflow.config)
+    algorithm = AlgorithmRegistry[workflow.instance.problem](workflow.instance.dataset, workflow.config)
     version = AlgorithmRegistry.get_algorithm_version(workflow.instance.problem)
-    flow = [workflow.data.content]
+    flow = [workflow]
     
     for module in algorithm:
         flow.append(module.preprocess(flow[-1]))

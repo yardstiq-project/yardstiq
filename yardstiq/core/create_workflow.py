@@ -3,22 +3,27 @@ from yardstiq.object.instance import Instance
 from yardstiq.object.workflow import WorkflowInfo
 from yardstiq.object.dataset import Dataset
 
+from pathlib import Path
+
 import json
 
-def create_workflow(
+def create_workflow_info(
         instance : Instance,
         config : Config
 ) -> WorkflowInfo:
-    """Function that loads the dataset and """
+    """Function that checks availability of the dataset and """
 
     #Check QPU/EMU availability
     #Check dataset availability
     #Check compatibility
 
-    #data = json.load(instance.dataset)
-    data = json.load(open(f"{instance.dataset}"))
-    dataset = Dataset(name=instance.dataset, hash=data["hash"], version=data["version"], content=data["content"])
+	# To replace with Aqora API
+    file = Path(instance.dataset)
+    if not file.is_file():
+        raise FileNotFoundError("Dataset file not found")
+	#
+    
 
-    return WorkflowInfo(instance, config, dataset)
+    return WorkflowInfo(instance, config)
 
 

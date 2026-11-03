@@ -4,11 +4,11 @@ from typing import Callable
 
 
 
-def algorithm(name: str = None, version: str = None):
+def algorithm(problem: str = None, version: str = None):
     """algorithm decorator to register an algorithm in the AlgorithmRegistry.
 
     Args:
-        name (str, optional): The name of the algorithm. Defaults to the function's name.
+        problem (str, optional): The problem the algorithm solves. Defaults to the function's name.
         version (str, optional): The version of the algorithm. Defaults to None.
     """
 
@@ -24,7 +24,7 @@ def algorithm(name: str = None, version: str = None):
                 raise TypeError(f"Algorithm '{func.__name__}' must return a list of TaskMod objects, but returned: {type(result).__name__}")
             return result
 
-        algorithm_name = name if name else func.__name__
+        algorithm_name = problem if problem else func.__name__
         AlgorithmRegistry.register_algorithm(algorithm_name, wrapper, version=version)
 
         return wrapper

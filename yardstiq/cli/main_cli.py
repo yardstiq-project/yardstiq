@@ -1,7 +1,7 @@
 import typer
 from typing import Optional
 from yardstiq.object.instance import Instance
-from yardstiq.core.create_workflow import create_workflow
+from yardstiq.core.create_workflow import create_workflow_info
 from yardstiq.core.create_workflowrun import create_workflowrun
 from .utils import create_config, debug_print
 from .tool import tool_cli
@@ -23,7 +23,7 @@ def run(
         ..., help="Name of a problem category to be run by the benchmark"
     ),
     dataset: str = typer.Argument(
-        ..., help="Name of a dataset to use with the problem"
+        ..., help="Uri of a dataset to use with the problem"
     ),
     qpu: str = typer.Argument(
         ..., help="Name of a QPU or emulator to run benchmark"
@@ -49,16 +49,16 @@ def run(
 
     debug_print(f"Initiating compilation run for: {problem}, {dataset}, {qpu}", debug)
 
-    parsed_instance = Instance(problem, dataset, qpu)
+    parsed_instance = Instance(problem, dataset)
     debug_print(f"Instance parsed: {parsed_instance}", debug)
 
-    parsed_config = create_config(config)
+    parsed_config = create_config(config, qpu)
     debug_print(f"Config used : {parsed_config}" if config else f"Using default config : {parsed_config}", True)
 
-    workflow = create_workflow(parsed_instance, parsed_config)
-    debug_print(f"Workflow created : {workflow}", debug)
+    workflow_info = create_workflow_info(parsed_instance, parsed_config)
+    debug_print(f"Workflow created : {workflow_info}", debug)
 
-    workflow_run = create_workflowrun(workflow, engine)
+    workflow_run = create_workflowrun(workflow_info, engine)
     debug_print(f"Workflowrun executed : {workflow_run}", debug)
 
     #submission manager part
