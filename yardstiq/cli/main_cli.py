@@ -35,7 +35,7 @@ def run(
         False, "--estimate", "-e", help="Option to prevent from running problem and estimate ressources cost"
     ),
     engine: Optional[str] = typer.Option(
-        "qall", "--engine", help="Option so declare which pipeline to use when running workflow"
+        "qall", "--engine", help="Option so declare which engine to use when running workflow"
     ),
     debug: Optional[bool] = typer.Option(
         False, "--debug", help="Option to print log info"

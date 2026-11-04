@@ -1,12 +1,17 @@
-from yardstiq.object.config import Config
-from yardstiq.object.taskMod import TaskMod
-from yardstiq.sdk.algorithm import algorithm
-from yardstiq.algorithm.modules.exemple_modules import create_matrix, create_circuit, data_loading
-from yardstiq.algorithm.modules.qall_circuit_executor import qall_circuit_executor
+from typing import Any
 
+from yardstiq.object.dataset import Dataset
+from yardstiq.object.config import Config
+from yardstiq.sdk.module import module
+from yardstiq.sdk.algorithm import algorithm
+from yardstiq.algorithm.modules.exemple_modules import create_matrix, create_circuit
+from yardstiq.algorithm.modules.qall_circuit_executor import run_circuit
+from yardstiq.sdk.module import moduleRegistry
+import numpy as np
+from qiskit import QuantumCircuit
 
 @algorithm(problem="exemple_algorithm", version="1.0.0")
-def example_algorithm(uri : str, config: Config) -> list[TaskMod]:
+def example_algorithm(config: Config) -> list[module]:
     """Example algorithm that returns a list of callable functions.
 
     Args:
@@ -16,14 +21,14 @@ def example_algorithm(uri : str, config: Config) -> list[TaskMod]:
         list: A list of callable functions.
     """
 
-    # Norammlly we should use the config in the modules.
+    # Normally we should use the config in the modules.
 
-    module_0 = data_loading
+    module_0 = moduleRegistry[str, Dataset, ["local"]]
+
     module_1 = create_matrix
-    module_2 = create_circuit
-    module_3 = qall_circuit_executor
 
-    return [TaskMod(module_0, {"uri" : uri}, {"min_cpu" : 1, "min_ram_gb" : 2}), 
-            TaskMod(module_1, {}, {"min_cpu" : 1, "min_ram_gb" : 2}), 
-            TaskMod(module_2, {}, {"min_cpu" : 1, "min_ram_gb" : 2}), 
-            TaskMod(module_3, {}, {})]
+    module_2 = moduleRegistry[np.ndarray, QuantumCircuit, ["QAOA"]]
+
+    module_3 = moduleRegistry[QuantumCircuit, Any, ["run", "local"]]
+
+    return [module_0, module_1, module_2, module_3]
