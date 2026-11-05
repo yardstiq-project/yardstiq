@@ -1,0 +1,13 @@
+profiles:
+  default:
+    provider: local
+    match_strategy: cheapest
+    allowed:
+      qpu:
+      - '*'
+      gpu:
+      - '*'
+      cpu:
+      - '*'
+    default: true
+version: '1.0'

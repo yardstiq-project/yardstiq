@@ -9,7 +9,7 @@ def quark_engine(workflow: WorkflowInfo) -> WorkflowRun:
 
     algorithm = AlgorithmRegistry[workflow.instance.problem](workflow.instance.dataset, workflow.config)
     algorithm_version = AlgorithmRegistry.get_algorithm_version(workflow.instance.problem)
-    flow = [workflow]
+    flow = [workflow.instance.dataset]
 
 
 

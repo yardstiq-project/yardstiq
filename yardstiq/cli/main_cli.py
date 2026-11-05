@@ -43,6 +43,9 @@ def run(
     remote: Optional[bool] = typer.Option(
         False, "--remote", help="Option to run the workflow remotely on a server"
     ),
+    add_content: Optional[str] = typer.Option(
+        None, "--add-content", help="Path to file to add content such as modules, algorithms, engines to Yardstiq" 
+    ),
     ):
     """Take a specific problem with a dataset and a QPU/EMU to run an instance.
         E.g.: ys run maxcut aqora-maxcut-01 qiskit-aer -c 'max-shot 10000 max-duration 10000 ...' """
