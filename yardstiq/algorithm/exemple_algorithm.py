@@ -7,6 +7,10 @@ from qiskit import QuantumCircuit, transpile
 from qiskit_aer import AerSimulator
 from qiskit.primitives import BackendSamplerV2
 
+
+
+
+
 @task()
 def run_circuit(circuit: QuantumCircuit):
     """Dummy function to run a circuit on a QPU/EMU using the qall engine"""
@@ -69,7 +73,10 @@ def data_loading(uri : str):
             }
     return data
 
+
+
 @qall.workflow()
+
 def example_algorithm():
     """Example algorithm that returns a list of callable functions.
 
