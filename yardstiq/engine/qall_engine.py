@@ -5,19 +5,26 @@ from yardstiq.object.workflow import WorkflowRun, WorkflowInfo
 from yardstiq.sdk.algorithm import AlgorithmRegistry
 import typer
 from yardstiq.algorithm.exemple_algorithm import example_algorithm
-import os
 
 
 @engine("qall")
 def qall_engine(workflow: WorkflowInfo) -> WorkflowRun:
     """"""
 
-    # algo = AlgorithmRegistry[workflow.instance.problem]
-    algo = [example_algorithm, "1.0.0", "yardstiq/algorithm/exemple_algorithm.py"]
+    # create source code
+
+    algo = AlgorithmRegistry[workflow.instance.problem]
+    #algo = [example_algorithm, "1.0.0", "yardstiq/algorithm/exemple_algorithm.py"]
     #algorithm = algo[0](workflow.config)
+
+
+    source = """
+    import qall
+    import quark
+    """ + algo[0](workflow.config)
+
     version = algo[1]
 
-    os.environ["QALL_WORKFLOW_DATASET"] = workflow.instance.dataset
 
     run_obj = create_workflow_run(
         entrypoint=algo[2],

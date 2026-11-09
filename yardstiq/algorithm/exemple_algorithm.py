@@ -76,7 +76,6 @@ def data_loading(uri : str):
 
 
 @qall.workflow()
-
 def example_algorithm():
     """Example algorithm that returns a list of callable functions.
 
