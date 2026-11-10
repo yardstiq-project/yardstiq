@@ -6,15 +6,11 @@ from yardstiq.core.create_workflowrun import create_workflowrun
 from .utils import create_config, debug_print
 from .tool import tool_cli
 
-
 app = typer.Typer(
-    name="ys",
-    help="A python tool for quantum benchmark",
-    no_args_is_help=True
+    name="ys", help="A python tool for quantum benchmark", no_args_is_help=True
 )
 
 app.add_typer(tool_cli)
-
 
 
 @app.command("run")
@@ -22,20 +18,21 @@ def run(
     problem: str = typer.Argument(
         ..., help="Name of a problem category to be run by the benchmark"
     ),
-    dataset: str = typer.Argument(
-        ..., help="Uri of a dataset to use with the problem"
-    ),
-    qpu: str = typer.Argument(
-        ..., help="Name of a QPU or emulator to run benchmark"
-    ),
+    dataset: str = typer.Argument(..., help="Uri of a dataset to use with the problem"),
+    qpu: str = typer.Argument(..., help="Name of a QPU or emulator to run benchmark"),
     config: Optional[str] = typer.Option(
         None, "--config", "-c", help="Config option for execution"
     ),
     estimate: Optional[bool] = typer.Option(
-        False, "--estimate", "-e", help="Option to prevent from running problem and estimate ressources cost"
+        False,
+        "--estimate",
+        "-e",
+        help="Option to prevent from running problem and estimate ressources cost",
     ),
     engine: Optional[str] = typer.Option(
-        "qall", "--engine", help="Option so declare which engine to use when running workflow"
+        "qall",
+        "--engine",
+        help="Option so declare which engine to use when running workflow",
     ),
     debug: Optional[bool] = typer.Option(
         False, "--debug", help="Option to print log info"
@@ -44,11 +41,14 @@ def run(
         False, "--remote", help="Option to run the workflow remotely on a server"
     ),
     add_content: Optional[str] = typer.Option(
-        None, "--add-content", help="Path to file to add content such as modules, algorithms, engines to Yardstiq" 
+        None,
+        "--add-content",
+        help="Path to file to add content such as modules, algorithms, engines to Yardstiq",
     ),
-    ):
+):
     """Take a specific problem with a dataset and a QPU/EMU to run an instance.
-        E.g.: ys run maxcut aqora-maxcut-01 qiskit-aer -c 'max-shot 10000 max-duration 10000 ...' """
+    E.g.: ys run maxcut aqora-maxcut-01 qiskit-aer -c 'max-shot 10000 max-duration 10000 ...'
+    """
 
     debug_print(f"Initiating compilation run for: {problem}, {dataset}, {qpu}", debug)
 
@@ -56,7 +56,14 @@ def run(
     debug_print(f"Instance parsed: {parsed_instance}", debug)
 
     parsed_config = create_config(config, qpu)
-    debug_print(f"Config used : {parsed_config}" if config else f"Using default config : {parsed_config}", True)
+    debug_print(
+        (
+            f"Config used : {parsed_config}"
+            if config
+            else f"Using default config : {parsed_config}"
+        ),
+        True,
+    )
 
     workflow_info = create_workflow_info(parsed_instance, parsed_config)
     debug_print(f"Workflow created : {workflow_info}", debug)
@@ -64,12 +71,14 @@ def run(
     workflow_run = create_workflowrun(workflow_info, engine)
     debug_print(f"Workflowrun executed : {workflow_run}", debug)
 
-    #submission manager part
+    # submission manager part
     typer.echo(f"Workflowrun executed : {workflow_run}")
+
 
 @app.command("login")
 def login():
     print(f"Not implemented yet")
+
 
 @app.command("logout")
 def logout():

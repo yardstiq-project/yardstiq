@@ -3,11 +3,11 @@ from yardstiq.object.config import Config
 from typing import Optional
 
 
-def create_config(raw : Optional[str], qpu : str) -> Config:
+def create_config(raw: Optional[str], qpu: str) -> Config:
     """Function to parse config text into Config structure"""
     if not raw:
         return Config()
-    
+
     lst = raw.split()
     if len(lst) % 2 != 0:
         raise typer.BadParameter("missing a key or a value in config")
@@ -24,7 +24,7 @@ def create_config(raw : Optional[str], qpu : str) -> Config:
     return Config.from_dict(parsed_config)
 
 
-def debug_print(msg : str, debug : bool):
+def debug_print(msg: str, debug: bool):
     """Function to print debug message if debug is True"""
     if debug:
         typer.echo(msg)

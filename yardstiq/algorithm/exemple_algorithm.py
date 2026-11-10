@@ -8,9 +8,6 @@ from qiskit_aer import AerSimulator
 from qiskit.primitives import BackendSamplerV2
 
 
-
-
-
 @task()
 def run_circuit(circuit: QuantumCircuit):
     """Dummy function to run a circuit on a QPU/EMU using the qall engine"""
@@ -25,6 +22,7 @@ def run_circuit(circuit: QuantumCircuit):
     counts = result[0].data.meas.get_counts()
     return counts
 
+
 @task()
 def create_matrix(dataset: dict):
     """Dummy function to create a matrix from input data"""
@@ -35,44 +33,43 @@ def create_matrix(dataset: dict):
     for u, v, weight in dataset["content"]:
         matrix[u, v] = weight
         matrix[v, u] = weight
-            
+
     return matrix
+
 
 @task()
 def create_circuit(matrix: np.ndarray):
-    """Dummy class to create a circuit from a matrix for testing purposes"""        
+    """Dummy class to create a circuit from a matrix for testing purposes"""
     n_qubits = matrix.shape[0]
-    pauli_list = []        
+    pauli_list = []
     for i in range(n_qubits):
         for j in range(i + 1, n_qubits):
             if matrix[i, j] != 0:
-                pauli_str = ['I'] * n_qubits
-                pauli_str[i] = 'Z'
-                pauli_str[j] = 'Z'
+                pauli_str = ["I"] * n_qubits
+                pauli_str[i] = "Z"
+                pauli_str[j] = "Z"
                 pauli_list.append(("".join(pauli_str[::-1]), matrix[i, j]))
-                    
+
     hamiltonian = SparsePauliOp.from_list(pauli_list)
     ansatz = QAOAAnsatz(hamiltonian, reps=1)
-    random_values = np.random.uniform(0, 2*np.pi, ansatz.num_parameters)
+    random_values = np.random.uniform(0, 2 * np.pi, ansatz.num_parameters)
     circuit = ansatz.assign_parameters(random_values)
     circuit.measure_all()
-         
+
     return circuit
 
+
 @task()
-def data_loading(uri : str):
-    """Dummy class to load a dataset from a file for testing purposes"""        
+def data_loading(uri: str):
+    """Dummy class to load a dataset from a file for testing purposes"""
 
-    data = {"version": "1.0", 
-            "hash": "abc123", 
-            "size": [3, 4], 
-            "content": [[0, 1, 1.0], 
-                        [1, 2, 2.5], 
-                        [2, 3, 1.2], 
-                        [3, 0, 0.8]]
-            }
+    data = {
+        "version": "1.0",
+        "hash": "abc123",
+        "size": [3, 4],
+        "content": [[0, 1, 1.0], [1, 2, 2.5], [2, 3, 1.2], [3, 0, 0.8]],
+    }
     return data
-
 
 
 @qall.workflow()
@@ -92,4 +89,3 @@ def example_algorithm():
         if not callable(module):
             raise TypeError(f"Module '{module.__name__}' is not callable.")
         res = module(res)
-

@@ -19,8 +19,9 @@ def _test_run_problem():
             runner.invoke(app, ["run", problem, "data_test.json", "qiskit-aer"])
         except Exception as e:
             if not problem == "maxcut":
-                assert isinstance(e, typer.BadParameter) 
-    
+                assert isinstance(e, typer.BadParameter)
+
+
 def _test_run_dataset():
     for dataset in _RUN_DATASET:
         try:
@@ -28,6 +29,7 @@ def _test_run_dataset():
         except Exception as e:
             if not dataset == "data_test.json":
                 assert isinstance(e, FileNotFoundError)
+
 
 def _test_run_qpu():
     for qpu in _RUN_QPU:
@@ -37,27 +39,47 @@ def _test_run_qpu():
             if not qpu == "qiskit-aer":
                 assert isinstance(e, typer.BadParameter)
 
+
 def _test_run_config():
     for config in _RUN_CONFIG:
         for value in _RUN_CONFIG_VALUES:
             try:
-                runner.invoke(app, ["run", "maxcut", "data_test.json", "qiskit-aer", f"{config} {value}"])
+                runner.invoke(
+                    app,
+                    [
+                        "run",
+                        "maxcut",
+                        "data_test.json",
+                        "qiskit-aer",
+                        f"{config} {value}",
+                    ],
+                )
             except Exception as e:
                 if not (config == "max-shot" and value == "42"):
                     assert isinstance(e, typer.BadParameter)
 
+
 def _test_run_pipeline():
     for pipeline in _RUN_PIPELINE:
         try:
-            runner.invoke(app, ["run", "maxcut", "data_test.json", "qiskit-aer", f"--pipeline {pipeline}"])
+            runner.invoke(
+                app,
+                [
+                    "run",
+                    "maxcut",
+                    "data_test.json",
+                    "qiskit-aer",
+                    f"--pipeline {pipeline}",
+                ],
+            )
         except Exception as e:
             if not pipeline == "qall":
                 assert isinstance(e, typer.BadParameter)
 
+
 def test_cli():
     _test_run_problem()
     _test_run_dataset()
-    _test_run_qpu() 
+    _test_run_qpu()
     _test_run_config()
     _test_run_pipeline()
-

@@ -1,61 +1,42 @@
-# from pyparsing import Optional
-# from qall import task
+from typing import Callable
+from dataclasses import dataclass, field
 
 
-# class Module:
-#     """Module is a wrapper for a function. A module is a callable that contains at least preprocess and postprocess methods and an initialization method. 
-#     Each process is dispatch on a specific ressource such as CPU, GPU or QPU
-    
-#     Attributes:
-#         task_config : Configuration of the task to be executed
-#         module : Module that contains logical methods to be executed for the task
-#         preprocess : Preprocess method of the module
-#         postprocess : Postprocess method of the module
-#     """
+@dataclass(frozen=True)
+class Module:
+    """Module is a wrapper for a function. A module is a callable that contains at least preprocess and postprocess methods and an initialization method.
+    Each process is dispatch on a specific ressource such as CPU, GPU or QPU
+    """
 
-#     def __init__(self, preprocess: callable, postprocess: Optional[callable] = None):
-#         """Initializes a Module with the specified preprocess and postprocess methods.
+    name: str
+    function: Callable
+    tags: list[str] = field(default_factory=list)
 
-#         Args:
-#             preprocess (callable): The preprocess method of the module.
-#             postprocess (callable, optional): The postprocess method of the module. Defaults to None.
-#             task_config (dict, optional): Configuration of the task to be executed. Defaults to None.
-#         """
-#         self.preprocess = preprocess
-#         if postprocess is None:
-#             self.postprocess = lambda x: x
-#         else:
-#             self.postprocess = postprocess
-
-#     def preprocess(self, data):
-#         """Preprocess method of the module"""
-#         return self.preprocess(data)
-
-#     def postprocess(self, data):
-#         """Postprocess method of the module"""
-#         return self.postprocess(data)
+    def __call__(self, *args, **kwargs):
+        return self.function(*args, **kwargs)
 
 
-# def moduleRegistry():
-#     """ModuleRegistry is a registry that holds all the modules registered in the system."""
-#     _modules = {}
+class ModuleRegistry:
+    """ModuleRegistry is a registry that holds all the modules registered in the system."""
 
-#     @classmethod
-#     def register_module(cls, name: str, module: Module):
-#         """Register a module in the ModuleRegistry.
+    _modules = {}
 
-#         Args:
-#             name (str): The name of the module.
-#             module (Module): The module to be registered.
-#         """
-#         cls._modules[name] = module
+    def register_module(cls, module: Module):
+        """Register a module in the ModuleRegistry."""
+        cls._modules[module.name] = module
 
-#     @classmethod
-#     def get_module(cls, name: str) -> Module:
-#         """Get a module from the ModuleRegistry.
+    def get_module(cls, name: str) -> Callable:
+        """Get a module from the ModuleRegistry."""
+        if name in cls._modules:
+            return cls._modules[name]
+        raise KeyError(f"Module with name '{name}' is not registered.")
 
-#         Args:
-#             name (str): The name of the module.
-#         """
-#         return cls._modules.get(name)
-        
+    def get_modules(cls):
+        """Get all registered modules."""
+        return cls._modules
+
+    def __getitem__(cls, name) -> Callable:
+        """Get a module from the ModuleRegistry"""
+        if name not in cls._modules:
+            raise KeyError(f"Module with name '{name}' is not registered.")
+        return cls._modules[name]

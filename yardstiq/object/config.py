@@ -2,6 +2,7 @@ from dataclasses import dataclass, field, fields
 import warnings
 import typer
 
+
 @dataclass(frozen=True)
 class Config:
     """Config represents the hyper parameters of an algorithm
@@ -24,21 +25,23 @@ class Config:
     compilation_parameters: dict = field(default_factory=dict)
 
     @classmethod
-    def from_dict(self, data : dict):
+    def from_dict(self, data: dict):
         """Creates a config from a dict and ignore non used parameters"""
 
         valid = {key.name for key in fields(self)}
         filtered = {}
         for raw_key, val in data.items():
-            key = raw_key.replace('-', '_')
+            key = raw_key.replace("-", "_")
 
             if key in valid:
                 if key != "compilation_parameters" and key != "hardware":
                     try:
                         filtered[key] = int(val)
                     except ValueError:
-                        raise typer.BadParameter(f"Config parameter {key} must be an integer, got {val}")
-                else: 
+                        raise typer.BadParameter(
+                            f"Config parameter {key} must be an integer, got {val}"
+                        )
+                else:
                     # This part needs further discussions
                     filtered[key] = val
             else:

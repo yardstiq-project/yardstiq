@@ -4,10 +4,11 @@ from qall import task
 from qiskit import QuantumCircuit, transpile
 from qiskit_aer import AerSimulator
 from qiskit.primitives import BackendSamplerV2
-#from yardstiq.sdk.module import module
+
+# from yardstiq.sdk.module import module
 
 
-#@module(name="run circuit", hash="jkl012", tags=["run", "local"])
+# @module(name="run circuit", hash="jkl012", tags=["run", "local"])
 @task()
 def run_circuit(circuit: QuantumCircuit):
     """Dummy function to run a circuit on a QPU/EMU using the qall engine"""
