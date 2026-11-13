@@ -6,6 +6,8 @@ from yardstiq.object.workflow import WorkflowRun, WorkflowInfo
 import typer
 from yardstiq.algorithm.exemple_algorithm import example_algorithm
 import inspect
+import tempfile
+from yardstiq.core.create_source import create_source
 
 
 @engine("qall")
@@ -13,48 +15,32 @@ def qall_engine(workflow: WorkflowInfo) -> WorkflowRun:
     """"""
 
     algo = algorithm_database[workflow.instance.problem]
-    algo_source = create_source(algo[0](workflow.config))
+    algo_source = create_source(algo.func(workflow.config))
 
     source = """
-    import qall
-    import quark
-    """ + algo_source
+from qall import task, workflow
+#import quark
 
-    version = algo[1]
+""" + algo_source
 
-    run_obj = create_workflow_run(
-        entrypoint=algo[2],
-        workflow_name=None,
-        workflow_version=None,
-        profile_name=None,
-        local_only=True,
-        input_artifact_hash=None,
-        allowed_cpus=None,
-        allowed_gpus=None,
-        allowed_qpus=None,
-        auto_start_daemon=True,
-    )
+    version = algo.version
+
+    with tempfile.NamedTemporaryFile(mode="w+", delete=True, suffix=".py") as file:
+        file.write(source)
+
+        file.flush()
+
+        run_obj = create_workflow_run(
+            entrypoint=file.name,
+            workflow_name=None,
+            workflow_version=None,
+            profile_name=None,
+            local_only=True,
+            input_artifact_hash=None,
+            allowed_cpus=None,
+            allowed_gpus=None,
+            allowed_qpus=None,
+            auto_start_daemon=True,
+        )
 
     return WorkflowRun(workflow, [], version, run_obj)
-
-
-def create_source(
-    modules: list[Module],
-):
-
-    func_defs = []
-    core_lines = ["@workflow()", "def example_source():", "    res = None"]
-
-    for module in modules:
-        raw, _ = inspect.getsourcelines(module.function)
-        clean_lines = [line for line in raw if not line.strip().startswith("@module")]
-        source = "".join(clean_lines)
-
-        func_defs.append(f"@task()\n{source}")
-
-        func_name = module.name
-        core_lines.append(f"    res = {func_name}(res)")
-
-    res = "\n".join(func_defs) + "\n\n" + "\n".join(core_lines) + "\n"
-
-    return res

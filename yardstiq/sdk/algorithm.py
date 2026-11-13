@@ -5,7 +5,7 @@ from yardstiq.object.algorithm import Algorithm
 from yardstiq.object.module import Module
 
 
-def algorithm(problem: str = None, version: str = None):
+def algorithm(problem: str = None, version: str = None, local: bool = False):
     """Algorithm decorator to register an algorithm in the AlgorithmRegistry.
 
     Args:
@@ -31,7 +31,7 @@ def algorithm(problem: str = None, version: str = None):
                 )
             return result
 
-        algo = Algorithm(algorithm_name, wrapper, version)
+        algo = Algorithm(algorithm_name, wrapper, version, local)
         algorithm_database.register_algorithm(algo)
         return algo
 

@@ -1,7 +1,7 @@
 from yardstiq.sdk.module import module
 
 
-@module(tags=["dense"])
+@module(tags=["dense"], qall_args={"requirements": ["numpy"]}, local=True)
 def create_matrix(dataset):
     import numpy as np
 
@@ -15,7 +15,7 @@ def create_matrix(dataset):
     return matrix
 
 
-@module(tags=["QAOA", "circuit"])
+@module(tags=["QAOA", "circuit"],qall_args={"requirements": ["qiskit", "numpy"]},local=True,)
 def create_circuit(matrix):
     from qiskit.quantum_info import SparsePauliOp
     from qiskit.circuit.library import QAOAAnsatz
@@ -29,7 +29,7 @@ def create_circuit(matrix):
                 pauli_str = ["I"] * n_qubits
                 pauli_str[i] = "Z"
                 pauli_str[j] = "Z"
-                pauli_list.append(("".join(pauli_str[::-1]), matrix[i, j]))
+                pauli_list.append(("".join(pauli_str[::-1]), float(matrix[i, j])))
 
     hamiltonian = SparsePauliOp.from_list(pauli_list)
     ansatz = QAOAAnsatz(hamiltonian, reps=1)
@@ -39,8 +39,8 @@ def create_circuit(matrix):
     return circuit
 
 
-@module(tags=["local"])
-def data_loading():
+@module(tags=["local"], local=True)
+def data_loading(a):
     data = {
         "version": "1.0",
         "hash": "abc123",
@@ -50,7 +50,7 @@ def data_loading():
     return data
 
 
-@module(tags=["local"])
+@module(tags=["local"], qall_args={"requirements": ["qiskit", "qiskit_aer"]}, local=True)
 def run_circuit(circuit):
     from qiskit.primitives import BackendSamplerV2
     from qiskit_aer import AerSimulator

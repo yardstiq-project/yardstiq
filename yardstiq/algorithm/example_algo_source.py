@@ -3,7 +3,7 @@ from yardstiq.sdk.algorithm import algorithm
 from yardstiq.object.config import Config
 
 
-@algorithm(problem="exemple_algorithm", version="1.0.0")
+@algorithm(problem="exemple_algorithm", version="1.0.0", local=True)
 def example_source(config: Config):
     """
     Example algorithm that returns a source code as a string to be run on Qall

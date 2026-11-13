@@ -9,6 +9,7 @@ class Algorithm:
     problem: str
     func: Callable
     version: str
+    local: bool = False
 
     def __call__(self, *args, **kwargs):
         return self.func(*args, **kwargs)
@@ -38,7 +39,7 @@ class AlgorithmRegistry:
             return cls._algorithms[problem]
         raise KeyError(f"Problem: '{problem}' is not registered.")
 
-    def __getitem__(cls, problem):
+    def __getitem__(cls, problem) -> Algorithm:
         return cls.get_algorithm(problem)
 
     def get_algorithms(cls):
