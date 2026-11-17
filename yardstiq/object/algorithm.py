@@ -10,9 +10,13 @@ class Algorithm:
     func: Callable
     version: str
     local: bool = False
+    hash : str = None
 
     def __call__(self, *args, **kwargs):
         return self.func(*args, **kwargs)
+
+    def register():
+        return
 
 
 class AlgorithmRegistry:
@@ -42,6 +46,10 @@ class AlgorithmRegistry:
     def __getitem__(cls, problem) -> Algorithm:
         return cls.get_algorithm(problem)
 
-    def get_algorithms(cls):
+    def get_algorithms(cls) -> list[Algorithm]:
         """Get all registered algorithms."""
-        return cls._algorithms.keys()
+        return cls._algorithms
+
+    def get_new_algos(cls) -> list[Algorithm]:
+        """Get all algorithms imported"""
+        return [algo for algo in cls._algorithms.values() if not algo.local]

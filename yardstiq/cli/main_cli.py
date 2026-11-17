@@ -5,12 +5,18 @@ from yardstiq.core.create_workflow import create_workflow_info
 from yardstiq.core.create_workflowrun import create_workflowrun
 from .utils import create_config, debug_print
 from .tool import tool_cli
+from .module import module_cli
+from .algorithm import algo_cli
+from .provider import provider_cli
 
 app = typer.Typer(
     name="ys", help="A python tool for quantum benchmark", no_args_is_help=True
 )
 
 app.add_typer(tool_cli)
+app.add_typer(module_cli)
+app.add_typer(algo_cli)
+app.add_typer(provider_cli)
 
 
 @app.command("run")

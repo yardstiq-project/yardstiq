@@ -4,6 +4,7 @@ import inspect
 
 def create_task(
     modules: list[Module],
+    entrypoint : bool =False
 ):
 
     func_defs = []
@@ -16,6 +17,8 @@ def create_task(
         qall_args = ", ".join(
             f"{cle} = {repr(valeur)}" for cle, valeur in module.qall_args.items()
         )
+        if entrypoint :
+            qall_args =  "entrypoint=True, " + qall_args 
         func_defs.append(f"@task({qall_args})\n{source}")
 
     res = "\n".join(func_defs) + "\n\n"

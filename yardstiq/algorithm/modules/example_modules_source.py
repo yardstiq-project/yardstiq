@@ -40,13 +40,37 @@ def create_circuit(matrix):
 
 
 @module(tags=["local"], local=True)
-def data_loading(a):
+def data_loading(n, densite=0.5):
+    """
+    Génère les données pour un graphe QAOA.
+    
+    :param n: La taille (nombre de nœuds ou qubits).
+    :param densite: Probabilité (entre 0 et 1) d'avoir une connexion entre deux nœuds.
+    :return: Dictionnaire contenant les métadonnées et la structure du graphe.
+    """
+    import random
+    import hashlib
+    import time
+    content = []
+    
+    for i in range(n):
+        for j in range(i + 1, n):
+            if random.random() < densite:
+                poids = round(random.uniform(0.5, 3.0), 1)
+                content.append([i, j, poids])
+                
+    if not content and n > 1:
+        content.append([0, 1, 1.0])
+
+    hash_str = hashlib.md5(str(time.time()).encode()).hexdigest()[:6]
+
     data = {
         "version": "1.0",
-        "hash": "abc123",
-        "size": [3, 4],
-        "content": [[0, 1, 1.0], [1, 2, 2.5], [2, 3, 1.2], [3, 0, 0.8]],
+        "hash": hash_str,
+        "size": [n, len(content)],
+        "content": content,
     }
+    
     return data
 
 

@@ -1,10 +1,14 @@
-# yardstiq/algorithm/__init__.py
 import importlib
 import pkgutil
+import json 
+
+from yardstiq.core.data_base import cursor
+from yardstiq.object.algorithm import Algorithm
+from yardstiq.object import algorithm_database
 
 
 def load_all_algorithms():
-    """Automatically imports all modules in the current package to ensure that all algorithms are registered."""
+    """Automatically imports all modules in the current package to ensure that all modules are registered."""
     package_name = __name__
     package_path = __path__
 
@@ -13,4 +17,28 @@ def load_all_algorithms():
         importlib.import_module(full_module_name)
 
 
+def placeholder_qall(data):
+    """qall func to run task using hash"""
+    return data
+
+
+def load_db():
+    """Loads all algorithms stored in database"""
+    cursor.execute("SELECT id, problem, version, hash FROM algorithms")
+    data = cursor.fetchall()
+    
+    for row in data:
+        algo_id, problem, version, algo_hash = row
+        
+        algo = Algorithm(
+            problem=problem,
+            func=placeholder_qall,
+            version=version,
+            local=True,
+            hash=algo_hash
+        )
+        
+        algorithm_database.register_algorithm(algo)
+
 load_all_algorithms()
+load_db()

@@ -1,18 +1,17 @@
 from yardstiq.object import module_database
 from yardstiq.sdk.algorithm import algorithm
-from yardstiq.object.config import Config
 
 
 @algorithm(problem="exemple_algorithm", version="1.0.0", local=True)
-def example_source(config: Config):
+def example_source():
     """
-    Example algorithm that returns a source code as a string to be run on Qall
-
-    Returns:
-        str: A string containing the source code of the algorithm.
     """
 
-    module_keys = ["data_loading", "create_matrix", "create_circuit", "run_circuit"]
-    modules = [module_database[key] for key in module_keys]
+    # modules
+    data_loading = module_database["data_loading"]
 
-    return modules
+    matrix      = module_database["create_matrix"]
+    create_circ  = module_database["create_circuit"]
+    run  = module_database["run_circuit"]
+
+    return [data_loading, matrix, create_circ, run]

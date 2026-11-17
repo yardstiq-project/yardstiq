@@ -16,6 +16,7 @@ class Module:
     path: Optional[str] = None
     tags: list[str] = field(default_factory=list)
     qall_args: dict = field(default_factory=dict)
+    hash : str = None
 
     def __call__(self, *args, **kwargs):
         return self.function(*args, **kwargs)
@@ -30,7 +31,7 @@ class ModuleRegistry:
         """Register a module in the ModuleRegistry."""
         cls._modules[module.name] = module
 
-    def get_module(cls, name: str) -> Callable:
+    def get_module(cls, name: str) -> Module:
         """Get a module from the ModuleRegistry."""
         if name in cls._modules:
             return cls._modules[name]
@@ -40,7 +41,7 @@ class ModuleRegistry:
         """Get all registered modules."""
         return cls._modules
 
-    def __getitem__(cls, name) -> Callable:
+    def __getitem__(cls, name) -> Module:
         """Get a module from the ModuleRegistry"""
         if name not in cls._modules:
             raise KeyError(f"Module with name '{name}' is not registered.")
@@ -48,3 +49,6 @@ class ModuleRegistry:
 
     def get_modules_file(cls, path: str) -> list[Module]:
         return [module for module in cls._modules.values() if module.path == path]
+
+    def get_non_local(cls) -> list[Module]:
+        return [module for module in cls._modules.values() if module.local == False]
