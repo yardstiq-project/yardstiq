@@ -1,5 +1,5 @@
 from yardstiq.sdk.module import module
-
+from qall import run
 
 @module(tags=["dense"], qall_args={"requirements": ["numpy"]}, local=True)
 def create_matrix(dataset):
@@ -15,7 +15,7 @@ def create_matrix(dataset):
     return matrix
 
 
-@module(tags=["QAOA", "circuit"],qall_args={"requirements": ["qiskit", "numpy"]},local=True,)
+@module(tags=["QAOA", "circuit"], qall_args={"requirements": ["qiskit", "numpy"],  },local=True,)
 def create_circuit(matrix):
     from qiskit.quantum_info import SparsePauliOp
     from qiskit.circuit.library import QAOAAnsatz
@@ -74,16 +74,8 @@ def data_loading(n, densite=0.5):
     return data
 
 
-@module(tags=["local"], qall_args={"requirements": ["qiskit", "qiskit_aer"]}, local=True)
+@module(tags=["local"], qall_args={"requirements": []}, local=True)
 def run_circuit(circuit):
-    from qiskit.primitives import BackendSamplerV2
-    from qiskit_aer import AerSimulator
-    from qiskit import transpile
-
-    sampler = BackendSamplerV2(backend=AerSimulator())
-    transpiled_circuit = transpile(circuit, backend=AerSimulator())
-    job = sampler.run([transpiled_circuit])
-    result = job.result()
-
-    counts = result[0].data.meas.get_counts()
+    results = run(circuit, 10000)
+    counts = results.get_counts()
     return counts

@@ -3,7 +3,7 @@ from yardstiq.sdk.algorithm import algorithm
 
 
 @algorithm(problem="exemple_algorithm", version="1.0.0", local=True)
-def example_source():
+def example_source(_):
     """
     """
 

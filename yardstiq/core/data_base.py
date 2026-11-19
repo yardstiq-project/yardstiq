@@ -48,7 +48,7 @@ def register_algo(file_path: str, name: str, requirement: list[str] = None):
     module = importlib.util.module_from_spec(spec)
     sys.modules[module_name] = module 
     spec.loader.exec_module(module)    
-    
+
     algo = algorithm_database[name]
     algo_source = create_source(algo())
     imp = "from qall import task, workflow\n"
@@ -124,36 +124,3 @@ def register_module(file_path: str = None, requirement: list[str] = None):
             )
 
             cursor.connection.commit()
-
-
-
-
-
-
-
-
-# def register_(file_path: str, names : list | str, type: str, requirements: list[str] = None):
-#     if requirements is None:
-#         requirements = []
-#     if type not in ["algo", "module"]:
-#         raise ValueError(f"Register received a {type} but only accepts module or algo.")
-
-#     path_json = Path(__file__).parent / "list_modules.json"
-#     try:
-#         with open(path_json, "r", encoding="utf-8") as file:
-#             data = json.load(file)
-#             if not isinstance(data, list):
-#                 data = []
-#     except (FileNotFoundError, json.JSONDecodeError):
-#         data = []
-
-#     new_elem = {
-#         "name" : names,
-#         "type": type,
-#         "requirements": requirements,
-#         "path" : file_path
-#     }
-#     data.append(new_elem)
-#     with open(path_json, "w", encoding="utf-8") as file:
-#         json.dump(data, file, indent=4)
-

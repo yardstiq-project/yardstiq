@@ -29,6 +29,9 @@ def provider_login(
     except Exception as e:
         typer.echo(f" Failed to login to {provider_name} : {e}", err=True)
         raise typer.Exit(code=1)
+    
+
+    
 
 @provider_cli.command("logout")
 def provider_logout():

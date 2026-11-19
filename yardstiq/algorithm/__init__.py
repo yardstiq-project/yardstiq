@@ -6,6 +6,7 @@ from yardstiq.core.data_base import cursor
 from yardstiq.object.algorithm import Algorithm
 from yardstiq.object import algorithm_database
 
+import yardstiq.algorithm.modules
 
 def load_all_algorithms():
     """Automatically imports all modules in the current package to ensure that all modules are registered."""
@@ -35,10 +36,11 @@ def load_db():
             func=placeholder_qall,
             version=version,
             local=True,
-            hash=algo_hash
+            hash=algo_hash,
+            modules=[]
         )
         
         algorithm_database.register_algorithm(algo)
 
-load_all_algorithms()
 load_db()
+load_all_algorithms()

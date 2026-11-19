@@ -5,7 +5,7 @@ from yardstiq.object.algorithm import Algorithm
 from yardstiq.object.module import Module
 
 
-def algorithm(problem: str = None, version: str = None, local: bool = False):
+def algorithm(problem: str = None, version: str = None, local: bool = False, info : list = None):
     """Algorithm decorator to register an algorithm in the AlgorithmRegistry.
 
     Args:
@@ -18,10 +18,8 @@ def algorithm(problem: str = None, version: str = None, local: bool = False):
 
     def decorator_algorithm(func: Callable):
 
-        algorithm_name = problem if problem else func.__name__
-
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> list[Module]:
             result = func(*args, **kwargs)
             if not isinstance(result, list) or not all(
                 isinstance(item, Module) for item in result
@@ -30,9 +28,31 @@ def algorithm(problem: str = None, version: str = None, local: bool = False):
                     f"Algorithm '{func.__name__}' must return a list containing modules, but returned: {type(result).__name__}"
                 )
             return result
+        lst = wrapper(None)
+        req = {}
+        for module in lst:
+            for cle, val in module.items():
+                if cle not in req:
+                    req[cle] = val
+                elif cle.startswith("max_"):
+                    req[cle] = min(req[cle], val)
+                elif cle.startswith("min_"):
+                    req[cle] = max(req[cle], val)
 
-        algo = Algorithm(algorithm_name, wrapper, version, local)
+        algo = Algorithm(problem=problem, 
+                         func= wrapper, 
+                         version=version,
+                         local= local, 
+                         modules=lst, 
+                         requirements=req,
+                         info=info
+                         )
         algorithm_database.register_algorithm(algo)
         return algo
 
     return decorator_algorithm
+
+
+
+
+

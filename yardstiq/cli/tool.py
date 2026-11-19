@@ -1,11 +1,14 @@
 import typer
+from yardstiq.core.ressources import print_ressoures
+
 
 tool_cli = typer.Typer(
-    name="tool", help="Generate tools for Yardstiq", no_args_is_help=True
+    name="tool", help="Tools for Yardstiq", no_args_is_help=True
 )
 
 
-@tool_cli.command("generate")
-def generate():
-    """Generate resources for Yardstiq. This command is not yet implemented."""
-    raise typer.BadParameter("generate is not yet implemented")
+@tool_cli.command("ressource")
+def list_ressources():
+    """Prints all ressources available"""
+    print_ressoures()
+    

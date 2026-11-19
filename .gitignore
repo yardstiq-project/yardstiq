@@ -222,3 +222,5 @@ __marimo__/
 .local
 
 *.db
+log
+test.py
