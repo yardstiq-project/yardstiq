@@ -19,7 +19,10 @@ CREATE TABLE IF NOT EXISTS algorithms (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     problem TEXT NOT NULL,
     version TEXT NOT NULL,
-    hash TEXT NOT NULL
+    hash TEXT NOT NULL,
+    infos TEXT NOT NULL,
+    requirement TEXT NOT NULL
+
 )
 """)
 
@@ -49,7 +52,7 @@ def register_algo(file_path: str, name: str, requirement: list[str] = None):
     sys.modules[module_name] = module 
     spec.loader.exec_module(module)    
 
-    algo = algorithm_database[name]
+    algo = algorithm_database[name][-1]
     algo_source = create_source(algo())
     imp = "from qall import task, workflow\n"
     for req in requirement:
@@ -70,10 +73,13 @@ def register_algo(file_path: str, name: str, requirement: list[str] = None):
             local_only=True,
             workflow_version=algo.version,
         )
+
+        infos = json.dumps(algo.info)
+        algo_req = json.dumps(algo.requirements)
         
         cursor.execute(
-            "INSERT INTO algorithms (problem, version, hash) VALUES (?, ?, ?)",
-            (algo.problem, algo.version, dag.root_hash),
+            "INSERT INTO algorithms (problem, version, hash, infos, requirements) VALUES (?, ?, ?, ?, ?)",
+            (algo.problem, algo.version, dag.root_hash, infos, algo_req),
         )
         cursor.connection.commit()
 

@@ -6,7 +6,7 @@ from yardstiq.core.data_base import cursor
 from yardstiq.object.algorithm import Algorithm
 from yardstiq.object import algorithm_database
 
-import yardstiq.algorithm.modules
+import yardstiq.algorithm.modules as _
 
 def load_all_algorithms():
     """Automatically imports all modules in the current package to ensure that all modules are registered."""
@@ -29,15 +29,24 @@ def load_db():
     data = cursor.fetchall()
     
     for row in data:
-        algo_id, problem, version, algo_hash = row
-        
+        algo_id, problem, version, algo_hash, infos_json, reqs_json = row
+
+        try:
+            infos = json.loads(infos_json) if infos_json else []
+            requirements = json.loads(reqs_json) if reqs_json else {}
+        except json.JSONDecodeError:
+            infos = []
+            requirements = {} 
+
         algo = Algorithm(
             problem=problem,
-            func=placeholder_qall,
             version=version,
-            local=True,
+            func=placeholder_qall,
+            modules=[],
             hash=algo_hash,
-            modules=[]
+            local=True,
+            requirements=requirements,
+            info=infos
         )
         
         algorithm_database.register_algorithm(algo)

@@ -16,6 +16,7 @@ class WorkflowInfo:
 
     instance: Instance
     config: Config
+    local : bool
 
 
 @dataclass(frozen=True)
@@ -29,6 +30,5 @@ class WorkflowRun:
     """
 
     workflow: WorkflowInfo
-    flow: list
     versions: dict
     result: any

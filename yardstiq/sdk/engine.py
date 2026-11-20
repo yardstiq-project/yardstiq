@@ -26,9 +26,9 @@ def engine(name: str = None):
                     f"Engine '{func.__name__}' only accepts WorkflowInfo as an input, got: {type(*args).__name__}"
                 )
             result = func(*args, **kwargs)
-            if not isinstance(result, WorkflowRun):
+            if result is not None and not isinstance(result, WorkflowRun):
                 raise TypeError(
-                    f"Engine '{func.__name__}' must return a WorkflowRun, got: {type(result).__name__}"
+                    f"Engine '{func.__name__}' must return a WorkflowRun or None, got: {type(result).__name__}"
                 )
             return result
 

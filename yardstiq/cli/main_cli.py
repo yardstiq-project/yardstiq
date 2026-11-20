@@ -45,14 +45,10 @@ def run(
     debug: Optional[bool] = typer.Option(
         False, "--debug", help="Option to print log info"
     ),
-    remote: Optional[bool] = typer.Option(
-        False, "--remote", help="Option to run the workflow remotely on a server"
+    local: Optional[bool] = typer.Option(
+        False, "--local", help="Option to run the workflow remotely on a server"
     ),
-    add_content: Optional[str] = typer.Option(
-        None,
-        "--add-content",
-        help="Path to file to add content such as modules, algorithms, engines to Yardstiq",
-    ),
+
 ):
     """Take a specific problem with a dataset and a QPU/EMU to run an instance.
     E.g.: ys run maxcut aqora-maxcut-01 qiskit-aer -c 'max-shot 10000 max-duration 10000 ...'
@@ -73,14 +69,14 @@ def run(
         True,
     )
 
-    workflow_info = create_workflow_info(parsed_instance, parsed_config)
+    workflow_info = create_workflow_info(parsed_instance, parsed_config, local)
     debug_print(f"Workflow created : {workflow_info}", debug)
 
     workflow_run = create_workflowrun(workflow_info, engine)
     debug_print(f"Workflowrun executed : {workflow_run}", debug)
 
     # submission manager part
-    typer.echo(f"Workflowrun executed : {workflow_run}")
+    debug_print(f"Workflowrun executed : {workflow_run}", debug)
 
 
 @app.command("login")

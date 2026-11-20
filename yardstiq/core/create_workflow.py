@@ -8,7 +8,7 @@ from pathlib import Path
 import json
 
 
-def create_workflow_info(instance: Instance, config: Config) -> WorkflowInfo:
+def create_workflow_info(instance: Instance, config: Config, local : bool = False) -> WorkflowInfo:
     """Function that checks availability of the dataset and"""
 
     # Check QPU/EMU availability
@@ -21,4 +21,4 @@ def create_workflow_info(instance: Instance, config: Config) -> WorkflowInfo:
         raise FileNotFoundError("Dataset file not found")
     #
 
-    return WorkflowInfo(instance, config)
+    return WorkflowInfo(instance, config, local)

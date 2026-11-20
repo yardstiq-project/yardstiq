@@ -2,7 +2,7 @@ from qall.object.resource import ResourceAvailability, Resource
 from qall.provider.workflow import get_provider_client_by_name
 from qall.provider.workflow.provider_client import WorkflowProviderClient
 from qall.provider.login import  get_provider_login_credentials, get_logged_provider_name
-
+from qall.provider.workflow.local import get_local_qpu_resources
 
 def log_to_provider() -> WorkflowProviderClient |  None:
     """Log to provider using stored data"""
@@ -18,12 +18,8 @@ def log_to_provider() -> WorkflowProviderClient |  None:
 
 PROVIDER = log_to_provider()
 
-def check_hardware_availability(hardware: str, filter: dict | None = None) -> Resource | None:
-    if not PROVIDER:
-        return None
-
-    lst = PROVIDER.list_resources(filter)
-    res = [elem for elem in lst if elem.name == hardware]
+def check_hardware_availability(hardware: str, ressources : list[Resource], filter: dict | None = None, ) -> Resource | None:
+    res = [elem for elem in ressources if elem.name == hardware]
 
     s = len(res)
     if s == 0:
@@ -35,15 +31,17 @@ def check_hardware_availability(hardware: str, filter: dict | None = None) -> Re
     return res[0]
 
 
-def print_ressoures():
+def print_ressoures(local : bool = False):
     """Prints all ressources available from provider"""
-    provider = log_to_provider()
 
-    if provider == None:
-        print("Can't connect to provider")
-        return
+    if not local:
+        if PROVIDER == None:
+            print("Can't connect to provider")
+            return
+        lst = PROVIDER.list_resources()
+    else:
+        lst = get_local_qpu_resources()
     
-    lst = provider.list_resources()
     for ressource in lst:
         if ressource.availability == ResourceAvailability.available:
             print(ressource.name)

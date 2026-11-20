@@ -46,4 +46,4 @@ class Config:
                     filtered[key] = val
             else:
                 warnings.warn(f"Passed config parameter is not supported: {key}")
-        return self(**filtered)
+        return Config(**filtered)

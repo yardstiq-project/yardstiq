@@ -1,8 +1,10 @@
 from yardstiq.object import module_database
 from yardstiq.sdk.algorithm import algorithm
 
+from qall.object.resource import QpuModality, QpuTopology
 
-@algorithm(problem="exemple_algorithm", version="1.0.0", local=True)
+
+@algorithm(problem="exemple_algorithm", version="1.0.0", local=True, info=[QpuModality.gate_based.value, QpuTopology.unknown.name, QpuTopology.all_to_all.name])
 def example_source(_):
     """
     """

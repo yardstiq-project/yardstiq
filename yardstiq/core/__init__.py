@@ -1,4 +1,4 @@
-from .ressources import log_to_provider, PROVIDER
+from .ressources import PROVIDER
 import typer
 
 if PROVIDER == None:

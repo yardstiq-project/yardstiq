@@ -31,7 +31,7 @@ def algorithm(problem: str = None, version: str = None, local: bool = False, inf
         lst = wrapper(None)
         req = {}
         for module in lst:
-            for cle, val in module.items():
+            for cle, val in module.qall_args.items():
                 if cle not in req:
                     req[cle] = val
                 elif cle.startswith("max_"):
@@ -39,14 +39,17 @@ def algorithm(problem: str = None, version: str = None, local: bool = False, inf
                 elif cle.startswith("min_"):
                     req[cle] = max(req[cle], val)
 
-        algo = Algorithm(problem=problem, 
-                         func= wrapper, 
-                         version=version,
-                         local= local, 
-                         modules=lst, 
-                         requirements=req,
-                         info=info
-                         )
+        name = ":".join([problem, version, *info])
+        algo = Algorithm(
+            problem=problem, 
+            func= wrapper, 
+            version=version,
+            local= local, 
+            modules=lst, 
+            requirements=req,
+            info=info,
+            name=name
+        )
         algorithm_database.register_algorithm(algo)
         return algo
 

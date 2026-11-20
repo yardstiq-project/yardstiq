@@ -6,21 +6,19 @@ from .module import Module
 class Algorithm:
     """"""
 
+    name : str
     problem: str
-    func: Callable
     version: str
+    func: Callable
     modules : list[Module]
-    local: bool = False
     hash : str = None
-    info : list[str] = field(default_factory=list[str])
+    local: bool = False
     requirements : dict = field(default_factory=dict)
-
+    info : list[str] = field(default_factory=list[str])
 
     def __call__(self, *args, **kwargs):
         return self.func(*args, **kwargs)
 
-    def register():
-        return
 
 
 class AlgorithmRegistry:
