@@ -93,7 +93,7 @@ from qall import task, workflow, run
 """ + algo_source
 
     version = algo.version
-
+    print(source)
     with tempfile.NamedTemporaryFile(mode="w+", delete=True, suffix=".py") as file:
         file.write(source)
 
