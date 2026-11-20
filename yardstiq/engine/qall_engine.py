@@ -14,6 +14,7 @@ from yardstiq.object.workflow import WorkflowRun, WorkflowInfo
 from yardstiq.core.create_source import create_source
 from yardstiq.core.ressources import check_hardware_availability, PROVIDER
 
+
 @engine("qall")
 def qall_engine(workflow: WorkflowInfo) -> WorkflowRun | None:
     """"""
@@ -23,7 +24,7 @@ def qall_engine(workflow: WorkflowInfo) -> WorkflowRun | None:
             print("Error: no connection to provider")
             return
         ressources = PROVIDER.list_resources()
-    else :
+    else:
         ressources = get_local_qpu_resources()
 
     hardware = check_hardware_availability(workflow.config.hardware, ressources)
@@ -31,7 +32,6 @@ def qall_engine(workflow: WorkflowInfo) -> WorkflowRun | None:
         typer.echo("Error: Can't find hardware")
         return None
     filters = hardware.qpu
-    
 
     algos = algorithm_database[workflow.instance.problem]
 
@@ -42,17 +42,18 @@ def qall_engine(workflow: WorkflowInfo) -> WorkflowRun | None:
 
     s = len(res)
     if s == 0:
-        print(f"Error: No algorithms found to run {workflow.instance.problem} on {workflow.config.hardware}")
+        print(
+            f"Error: No algorithms found to run {workflow.instance.problem} on {workflow.config.hardware}"
+        )
         return None
     elif s > 1:
-        # chose between algorithms
         selected_algo = res[0]
     else:
         selected_algo = res[0]
 
     if selected_algo.hash is None:
         res = None
-        try :
+        try:
             res = run_new_algo(selected_algo, workflow)
         except Exception as e:
             print(f"Error reason: {e} ")
@@ -62,16 +63,14 @@ def qall_engine(workflow: WorkflowInfo) -> WorkflowRun | None:
     return None
 
 
-def check_algo_compatibility(algo : Algorithm, q_spec: QpuSpec) -> bool:
+def check_algo_compatibility(algo: Algorithm, q_spec: QpuSpec) -> bool:
     """Check if algorithm follows specification of hardware"""
 
-    # Algo flags
     if q_spec.modality.value not in algo.info:
         return False
     elif q_spec.topology.value not in algo.info:
         return False
 
-    # Compare Hardware spec with algo
     spec = algo.requirements
     for key, val in spec.items():
         if hasattr(q_spec, key):

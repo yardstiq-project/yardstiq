@@ -48,7 +48,6 @@ def run(
     local: Optional[bool] = typer.Option(
         False, "--local", help="Option to run the workflow remotely on a server"
     ),
-
 ):
     """Take a specific problem with a dataset and a QPU/EMU to run an instance.
     E.g.: ys run maxcut aqora-maxcut-01 qiskit-aer -c 'max-shot 10000 max-duration 10000 ...'

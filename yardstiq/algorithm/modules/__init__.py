@@ -1,6 +1,6 @@
 import importlib
 import pkgutil
-import json 
+import json
 
 from yardstiq.core.data_base import cursor
 from yardstiq.object.module import Module
@@ -26,26 +26,27 @@ def load_db():
     """Loads all modules stored in database"""
     cursor.execute("SELECT id, name, version, hash, tags FROM modules")
     data = cursor.fetchall()
-    
+
     for row in data:
         module_id, name, version, module_hash, tags_str = row
-        
+
         try:
             tags = json.loads(tags_str) if tags_str else []
         except json.JSONDecodeError:
-            tags = [] 
+            tags = []
 
         module = Module(
-            name=name,                 
-            function=placeholder_qall,    
-            version=version,           
-            local=True,               
-            tags=tags,                
-            qall_args={},              
-            hash=module_hash       
+            name=name,
+            function=placeholder_qall,
+            version=version,
+            local=True,
+            tags=tags,
+            qall_args={},
+            hash=module_hash,
         )
-        
+
         module_database.register_module(module)
+
 
 load_all_algorithms()
 load_db()

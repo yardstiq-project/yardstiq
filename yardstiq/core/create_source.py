@@ -4,10 +4,7 @@ import ast
 import textwrap
 
 
-def create_task(
-    modules: list[Module],
-    entrypoint: bool = False
-):
+def create_task(modules: list[Module], entrypoint: bool = False):
     func_defs = []
     for module in modules:
         raw_source = inspect.getsource(module.function)
@@ -18,7 +15,7 @@ def create_task(
         )
         if entrypoint:
             qall_args = "entrypoint=True, " + qall_args
-            
+
         func_defs.append(f"@task({qall_args})\n{source}")
 
     return "\n".join(func_defs) + "\n\n"
@@ -27,9 +24,9 @@ def create_task(
 def remove_module_decorator(source: str) -> str:
     dedented = textwrap.dedent(source)
     tree = ast.parse(dedented)
-    
+
     func_node = tree.body[0]
-    
+
     if isinstance(func_node, (ast.FunctionDef, ast.AsyncFunctionDef)):
         new_decorators = []
         for dec in func_node.decorator_list:
@@ -39,10 +36,10 @@ def remove_module_decorator(source: str) -> str:
                 and isinstance(dec.func, ast.Name)
                 and dec.func.id == "module"
             )
-            
+
             if not (is_bare_module or is_call_module):
                 new_decorators.append(dec)
-                
+
         func_node.decorator_list = new_decorators
 
     return ast.unparse(tree)

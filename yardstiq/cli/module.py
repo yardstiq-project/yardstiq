@@ -12,25 +12,22 @@ module_cli = typer.Typer(
 
 @module_cli.command("add")
 def module(
-    path: str = typer.Argument(
-        ..., help="Path to the file containing the module(s)"
-    ),
+    path: str = typer.Argument(..., help="Path to the file containing the module(s)"),
     req: list[str] = typer.Option(
         [], "--requirement", "-r", help="Depedencies needed to execute module(s)"
     ),
-
-    ):
+):
     """Add a module to YS"""
     register_module(path, req)
+
 
 @module_cli.command("ls")
 def list_module():
     """List all modules registered in Yardstiq"""
-    
+
     lst = module_database.get_modules()
     typer.echo(f"List of modules registered:")
     for module in lst.values():
-        typer.echo(f"Module : name= {module.name}, hash= {module.hash}, tags= {module.tags}")
-    
-
-
+        typer.echo(
+            f"Module : name= {module.name}, hash= {module.hash}, tags= {module.tags}"
+        )

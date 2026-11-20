@@ -16,7 +16,7 @@ class Module:
     path: Optional[str] = None
     tags: list[str] = field(default_factory=list)
     qall_args: dict = field(default_factory=dict)
-    hash : str = None
+    hash: str = None
 
     def __call__(self, *args, **kwargs):
         return self.function(*args, **kwargs)

@@ -30,7 +30,7 @@ def module(
             qall_args=qall_args,
             path=path,
             version=version,
-            tags=tags
+            tags=tags,
         )
         module_database.register_module(mod)
         return mod

@@ -5,7 +5,9 @@ from yardstiq.object.algorithm import Algorithm
 from yardstiq.object.module import Module
 
 
-def algorithm(problem: str = None, version: str = None, local: bool = False, info : list = None):
+def algorithm(
+    problem: str = None, version: str = None, local: bool = False, info: list = None
+):
     """Algorithm decorator to register an algorithm in the AlgorithmRegistry.
 
     Args:
@@ -28,6 +30,7 @@ def algorithm(problem: str = None, version: str = None, local: bool = False, inf
                     f"Algorithm '{func.__name__}' must return a list containing modules, but returned: {type(result).__name__}"
                 )
             return result
+
         lst = wrapper(None)
         req = {}
         for module in lst:
@@ -41,21 +44,16 @@ def algorithm(problem: str = None, version: str = None, local: bool = False, inf
 
         name = ":".join([problem, version, *info])
         algo = Algorithm(
-            problem=problem, 
-            func= wrapper, 
+            problem=problem,
+            func=wrapper,
             version=version,
-            local= local, 
-            modules=lst, 
+            local=local,
+            modules=lst,
             requirements=req,
             info=info,
-            name=name
+            name=name,
         )
         algorithm_database.register_algorithm(algo)
         return algo
 
     return decorator_algorithm
-
-
-
-
-

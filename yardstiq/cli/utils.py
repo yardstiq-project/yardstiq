@@ -5,7 +5,7 @@ from typing import Optional
 
 def create_config(raw: Optional[str], qpu: str) -> Config:
     """Function to parse config text into Config structure"""
-    if  raw == None:
+    if raw == None:
         return Config(hardware=qpu)
 
     lst = raw.split()

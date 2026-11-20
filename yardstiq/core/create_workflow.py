@@ -8,7 +8,9 @@ from pathlib import Path
 import json
 
 
-def create_workflow_info(instance: Instance, config: Config, local : bool = False) -> WorkflowInfo:
+def create_workflow_info(
+    instance: Instance, config: Config, local: bool = False
+) -> WorkflowInfo:
     """Function that checks availability of the dataset and"""
 
     # Check QPU/EMU availability

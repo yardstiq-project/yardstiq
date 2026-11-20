@@ -16,7 +16,7 @@ class WorkflowInfo:
 
     instance: Instance
     config: Config
-    local : bool
+    local: bool
 
 
 @dataclass(frozen=True)

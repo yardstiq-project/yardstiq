@@ -1,12 +1,13 @@
 import importlib
 import pkgutil
-import json 
+import json
 
 from yardstiq.core.data_base import cursor
 from yardstiq.object.algorithm import Algorithm
 from yardstiq.object import algorithm_database
 
 import yardstiq.algorithm.modules as _
+
 
 def load_all_algorithms():
     """Automatically imports all modules in the current package to ensure that all modules are registered."""
@@ -27,7 +28,7 @@ def load_db():
     """Loads all algorithms stored in database"""
     cursor.execute("SELECT id, problem, version, hash FROM algorithms")
     data = cursor.fetchall()
-    
+
     for row in data:
         algo_id, problem, version, algo_hash, infos_json, reqs_json = row
 
@@ -36,7 +37,7 @@ def load_db():
             requirements = json.loads(reqs_json) if reqs_json else {}
         except json.JSONDecodeError:
             infos = []
-            requirements = {} 
+            requirements = {}
 
         algo = Algorithm(
             problem=problem,
@@ -46,10 +47,11 @@ def load_db():
             hash=algo_hash,
             local=True,
             requirements=requirements,
-            info=infos
+            info=infos,
         )
-        
+
         algorithm_database.register_algorithm(algo)
+
 
 load_db()
 load_all_algorithms()

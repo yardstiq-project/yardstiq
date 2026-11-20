@@ -2,8 +2,11 @@ import typer
 from yardstiq.core.provider import login_provider_ys, logout_provider_ys
 
 provider_cli = typer.Typer(
-    name="provider", help="Configure compute provider environments", no_args_is_help=True
+    name="provider",
+    help="Configure compute provider environments",
+    no_args_is_help=True,
 )
+
 
 @provider_cli.command(
     "login", context_settings={"allow_extra_args": True, "ignore_unknown_options": True}
@@ -29,9 +32,7 @@ def provider_login(
     except Exception as e:
         typer.echo(f" Failed to login to {provider_name} : {e}", err=True)
         raise typer.Exit(code=1)
-    
 
-    
 
 @provider_cli.command("logout")
 def provider_logout():

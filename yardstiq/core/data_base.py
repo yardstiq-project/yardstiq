@@ -49,8 +49,8 @@ def register_algo(file_path: str, name: str, requirement: list[str] = None):
     if spec is None or spec.loader is None:
         raise ImportError(f"Impossible de charger le fichier : {file_path}")
     module = importlib.util.module_from_spec(spec)
-    sys.modules[module_name] = module 
-    spec.loader.exec_module(module)    
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)
 
     algo = algorithm_database[name][-1]
     algo_source = create_source(algo())
@@ -61,10 +61,12 @@ def register_algo(file_path: str, name: str, requirement: list[str] = None):
     imp += "\n"
     source = imp + algo_source
     folder = os.path.dirname(file_path)
-    
-    with tempfile.NamedTemporaryFile(mode="w+", delete=True, suffix=".py", dir=folder) as file:
+
+    with tempfile.NamedTemporaryFile(
+        mode="w+", delete=True, suffix=".py", dir=folder
+    ) as file:
         file.write(source)
-        file.flush()   
+        file.flush()
 
         work = WorkflowSpec(file.name)
         tag, dag = push_workflow_on_registry(
@@ -76,12 +78,13 @@ def register_algo(file_path: str, name: str, requirement: list[str] = None):
 
         infos = json.dumps(algo.info)
         algo_req = json.dumps(algo.requirements)
-        
+
         cursor.execute(
             "INSERT INTO algorithms (problem, version, hash, infos, requirements) VALUES (?, ?, ?, ?, ?)",
             (algo.problem, algo.version, dag.root_hash, infos, algo_req),
         )
         cursor.connection.commit()
+
 
 def register_module(file_path: str = None, requirement: list[str] = None):
 
@@ -100,7 +103,7 @@ def register_module(file_path: str = None, requirement: list[str] = None):
 
     modules = module_database.get_non_local()
     folder = os.path.dirname(file_path)
-    
+
     for module in modules:
 
         source = create_task([module], True)
@@ -109,7 +112,7 @@ def register_module(file_path: str = None, requirement: list[str] = None):
             imp += f"import {req}\n"
         imp += "\n"
         file_source = imp + source
-        
+
         with tempfile.NamedTemporaryFile(
             mode="w+", delete=True, suffix=".py", dir=folder
         ) as file:
