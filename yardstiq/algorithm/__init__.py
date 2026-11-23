@@ -30,24 +30,17 @@ def load_db():
     data = cursor.fetchall()
 
     for row in data:
-        algo_id, problem, version, algo_hash, infos_json, reqs_json = row
+        algo_id, problem, version, algo_hash = row
 
-        try:
-            infos = json.loads(infos_json) if infos_json else []
-            requirements = json.loads(reqs_json) if reqs_json else {}
-        except json.JSONDecodeError:
-            infos = []
-            requirements = {}
+        name = ":".join([problem, version])
 
         algo = Algorithm(
             problem=problem,
             version=version,
             func=placeholder_qall,
-            modules=[],
             hash=algo_hash,
             local=True,
-            requirements=requirements,
-            info=infos,
+            name = name
         )
 
         algorithm_database.register_algorithm(algo)

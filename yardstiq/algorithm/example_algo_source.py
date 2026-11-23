@@ -8,11 +8,6 @@ from qall.object.resource import QpuModality, QpuTopology
     problem="exemple_algorithm",
     version="1.0.0",
     local=True,
-    info=[
-        QpuModality.gate_based.value,
-        QpuTopology.unknown.name,
-        QpuTopology.all_to_all.name,
-    ],
 )
 def example_source(_):
     """ """

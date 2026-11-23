@@ -1,5 +1,5 @@
 import typer
-from yardstiq.core.data_base import register_module
+from yardstiq.core.data_base import register_module, clear_module
 from yardstiq.object import module_database
 from yardstiq.core.data_base import cursor
 from yardstiq.algorithm.modules import load_db
@@ -31,3 +31,8 @@ def list_module():
         typer.echo(
             f"Module : name= {module.name}, hash= {module.hash}, tags= {module.tags}"
         )
+
+@module_cli.command("clear")
+def clear_modules():
+    """Clear all modules registered in Yardstiq"""
+    clear_module()

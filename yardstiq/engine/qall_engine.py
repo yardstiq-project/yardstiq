@@ -6,6 +6,9 @@ import traceback
 from qall.core import create_workflow_run
 from qall.object.resource import Resource, QpuSpec, QpuModality
 from qall.provider.workflow.local import get_local_qpu_resources
+from qall.registry import BlockRegistry
+from qall.object.task import TaskNode
+from qall.object.resource_contraint import QuantumResourceConstraints
 
 from yardstiq.sdk.engine import engine
 from yardstiq.object import algorithm_database
@@ -14,6 +17,7 @@ from yardstiq.object.workflow import WorkflowRun, WorkflowInfo
 from yardstiq.core.create_source import create_source
 from yardstiq.core.ressources import check_hardware_availability, PROVIDER
 
+DISK = BlockRegistry()
 
 @engine("qall")
 def qall_engine(workflow: WorkflowInfo) -> WorkflowRun | None:
@@ -31,10 +35,9 @@ def qall_engine(workflow: WorkflowInfo) -> WorkflowRun | None:
     if hardware == None:
         typer.echo("Error: Can't find hardware")
         return None
+    
     filters = hardware.qpu
-
     algos = algorithm_database[workflow.instance.problem]
-
     res = []
     for algo in algos:
         if check_algo_compatibility(algo, filters):
@@ -64,23 +67,37 @@ def qall_engine(workflow: WorkflowInfo) -> WorkflowRun | None:
 
 
 def check_algo_compatibility(algo: Algorithm, q_spec: QpuSpec) -> bool:
-    """Check if algorithm follows specification of hardware"""
+    """Check if algorithm follows specification of hardware."""
+    contraints = {}
 
-    if q_spec.modality.value not in algo.info:
-        return False
-    elif q_spec.topology.value not in algo.info:
-        return False
+    def get_task_contraint(node_hash: str) -> None:
+        task = DISK.get_node_from_local(node_hash)
+        
+        for cl, val in task.resources.quantum.to_dict().items():
+            if cl not in contraints:
+                contraints[cl] = val
+            elif cl.startswith("max"):
+                contraints[cl] = min(contraints[cl], val)
+            elif cl.startswith("min"):
+                contraints[cl] = max(contraints[cl], val)
+        
+        for child_hash in task.children.values():
+            get_task_contraint(child_hash)
 
-    spec = algo.requirements
-    for key, val in spec.items():
+    get_task_contraint(algo.hash)
+
+    for key, val in contraints.items():
         if hasattr(q_spec, key):
             elem = getattr(q_spec, key)
+            if key.startswith("max") and elem > val:
+                return False
+            if key.startswith("min") and elem < val:
+                return False
 
-            if key.startswith("max_") and elem > val:
-                return False
-            elif key.startswith("min_") and elem < val:
-                return False
     return True
+
+
+
 
 
 def run_new_algo(algo: Algorithm, workflow: WorkflowInfo) -> WorkflowRun:
@@ -93,7 +110,6 @@ from qall import task, workflow, run
 """ + algo_source
 
     version = algo.version
-    print(source)
     with tempfile.NamedTemporaryFile(mode="w+", delete=True, suffix=".py") as file:
         file.write(source)
 

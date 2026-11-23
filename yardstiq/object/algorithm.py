@@ -11,11 +11,8 @@ class Algorithm:
     problem: str
     version: str
     func: Callable
-    modules: list[Module]
     hash: str = None
     local: bool = False
-    requirements: dict = field(default_factory=dict)
-    info: list[str] = field(default_factory=list[str])
 
     def __call__(self, *args, **kwargs):
         return self.func(*args, **kwargs)
@@ -60,3 +57,6 @@ class AlgorithmRegistry:
             for algo in algos_list
             if not algo.local
         ]
+
+    def clear(cls):
+        cls._algorithms = {}

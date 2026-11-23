@@ -19,10 +19,7 @@ CREATE TABLE IF NOT EXISTS algorithms (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     problem TEXT NOT NULL,
     version TEXT NOT NULL,
-    hash TEXT NOT NULL,
-    infos TEXT NOT NULL,
-    requirement TEXT NOT NULL
-
+    hash TEXT NOT NULL
 )
 """)
 
@@ -44,6 +41,8 @@ def register_algo(file_path: str, name: str, requirement: list[str] = None):
     if requirement is None:
         requirement = []
 
+    algorithm_database.clear()
+
     module_name = os.path.splitext(os.path.basename(file_path))[0]
     spec = importlib.util.spec_from_file_location(module_name, file_path)
     if spec is None or spec.loader is None:
@@ -53,7 +52,7 @@ def register_algo(file_path: str, name: str, requirement: list[str] = None):
     spec.loader.exec_module(module)
 
     algo = algorithm_database[name][-1]
-    algo_source = create_source(algo())
+    algo_source = create_source(algo(None))
     imp = "from qall import task, workflow\n"
     for req in requirement:
         imp += f"import {req}\n"
@@ -76,12 +75,9 @@ def register_algo(file_path: str, name: str, requirement: list[str] = None):
             workflow_version=algo.version,
         )
 
-        infos = json.dumps(algo.info)
-        algo_req = json.dumps(algo.requirements)
-
         cursor.execute(
-            "INSERT INTO algorithms (problem, version, hash, infos, requirements) VALUES (?, ?, ?, ?, ?)",
-            (algo.problem, algo.version, dag.root_hash, infos, algo_req),
+            "INSERT INTO algorithms (problem, version, hash) VALUES (?, ?, ?)",
+            (algo.problem, algo.version, dag.root_hash),
         )
         cursor.connection.commit()
 
@@ -133,3 +129,15 @@ def register_module(file_path: str = None, requirement: list[str] = None):
             )
 
             cursor.connection.commit()
+
+
+def clear_algo():
+    cursor.execute("DELETE FROM algorithms")
+    cursor.execute("DELETE FROM sqlite_sequence WHERE name='algorithms'")
+    cursor.connection.commit()
+
+def clear_module():
+    cursor.execute("DELETE FROM modules")
+    cursor.execute("DELETE FROM sqlite_sequence WHERE name='modules'")
+    cursor.connection.commit()
+
