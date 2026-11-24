@@ -31,7 +31,6 @@ def load_db():
 
     for row in data:
         algo_id, problem, version, algo_hash = row
-
         name = ":".join([problem, version])
 
         algo = Algorithm(

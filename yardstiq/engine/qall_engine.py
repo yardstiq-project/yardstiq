@@ -9,6 +9,7 @@ from qall.provider.workflow.local import get_local_qpu_resources
 from qall.registry import BlockRegistry
 from qall.object.task import TaskNode
 from qall.object.resource_contraint import QuantumResourceConstraints
+from qall.core.workflow_run import run_workflow
 
 from yardstiq.sdk.engine import engine
 from yardstiq.object import algorithm_database
@@ -63,7 +64,9 @@ def qall_engine(workflow: WorkflowInfo) -> WorkflowRun | None:
             print(f"Error reason: {e} ")
             traceback.print_exc()
         return res
-    print("Feature not ready yet")
+    else :
+        run_workflow(algo.hash)
+        print("Feature not ready yet")
     return None
 
 
@@ -85,6 +88,8 @@ def check_algo_compatibility(algo: Algorithm, q_spec: QpuSpec) -> bool:
         for child_hash in task.children.values():
             get_task_contraint(child_hash)
 
+    if algo.hash == None:
+        return True
     get_task_contraint(algo.hash)
 
     for key, val in contraints.items():
@@ -106,7 +111,8 @@ def run_new_algo(algo: Algorithm, workflow: WorkflowInfo) -> WorkflowRun:
 from qall import task, workflow, run
 
 """ + algo_source
-
+    print(source)
+    return
     version = algo.version
     with tempfile.NamedTemporaryFile(mode="w+", delete=True, suffix=".py") as file:
         file.write(source)
