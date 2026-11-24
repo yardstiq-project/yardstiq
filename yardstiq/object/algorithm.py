@@ -1,5 +1,5 @@
 from typing import Callable
-from dataclasses import dataclass, field
+from dataclasses import dataclass, replace
 from .module import Module
 
 
@@ -13,6 +13,7 @@ class Algorithm:
     func: Callable
     hash: str = None
     local: bool = False
+    id: str = "Not registered"
 
     def __call__(self, *args, **kwargs):
         return self.func(*args, **kwargs)
@@ -31,7 +32,25 @@ class AlgorithmRegistry:
             func (callable): The function that implements the algorithm.
             version (str, optional): The version of the algorithm. Defaults to None.
         """
-        cls._algorithms.setdefault(algo.problem, []).append(algo)
+        lst = cls._algorithms.setdefault(algo.problem, [])
+        existing_versions = {alg.version for alg in lst}
+
+        base_version = algo.version
+        new_version = base_version
+        counter = 1
+
+        while new_version in existing_versions:
+            new_version = f"{base_version}.{counter}"
+            counter += 1
+
+        names = algo.name.split(":")
+        names[-1] = new_version
+
+        name = ":".join(names)
+        if new_version != algo.version:
+            algo = replace(algo, version=new_version, name=name)
+
+        lst.append(algo)
 
     def get_algorithm(cls, problem: str) -> list[Algorithm]:
         """Get an algorithm from the AlgorithmRegistry.

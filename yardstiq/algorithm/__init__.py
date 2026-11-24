@@ -40,7 +40,8 @@ def load_db():
             func=placeholder_qall,
             hash=algo_hash,
             local=True,
-            name = name
+            name=name,
+            id=algo_id,
         )
 
         algorithm_database.register_algorithm(algo)

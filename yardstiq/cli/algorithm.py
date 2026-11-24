@@ -1,5 +1,6 @@
 import typer
-from yardstiq.core.data_base import register_algo, clear_algo
+
+from yardstiq.core.data_base import register_algo, clear_algo, delete_algo
 from yardstiq.object import algorithm_database
 from yardstiq.object.algorithm import Algorithm
 
@@ -24,14 +25,26 @@ def algo(
 def list_algo():
     """List all algorithms registered in Yardstiq"""
     lst = algorithm_database.get_algorithms()
-    typer.echo(f"List of algorithms registered:")
+    typer.echo("List of algorithms registered:")
     for problem, algos in lst.items():
-        typer.echo(f"Algorithm type : {problem}")
+        typer.echo(f"\nAlgorithm type : {problem}")
+        typer.echo(f"{'ID':<18} {'NAME':<34} {'HASH'}")
         for algo in algos:
-            typer.echo(f"Algorithm : {algo.name}")
+            typer.echo(f"{str(algo.id):<18} {algo.name:<34} {algo.hash}")
+
 
 @algo_cli.command("clear")
 def clear_algos():
     """Clear all algorithms registered in Yardstiq"""
     clear_algo()
 
+
+@algo_cli.command("delete")
+def clear_algos(
+    id: str = typer.Argument(..., help="Name of the algorithm to delete"),
+):
+    """Clear specific algorithm registered in Yardstiq"""
+    if not delete_algo(id):
+        typer.echo(f"Warning: can't delete algo with id : {id}")
+    else:
+        typer.echo(f"Successfully removed algo : {id}")

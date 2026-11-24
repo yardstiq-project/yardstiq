@@ -41,8 +41,6 @@ def register_algo(file_path: str, name: str, requirement: list[str] = None):
     if requirement is None:
         requirement = []
 
-    algorithm_database.clear()
-
     module_name = os.path.splitext(os.path.basename(file_path))[0]
     spec = importlib.util.spec_from_file_location(module_name, file_path)
     if spec is None or spec.loader is None:
@@ -51,7 +49,10 @@ def register_algo(file_path: str, name: str, requirement: list[str] = None):
     sys.modules[module_name] = module
     spec.loader.exec_module(module)
 
+    if algorithm_database[name] == None:
+        return
     algo = algorithm_database[name][-1]
+
     algo_source = create_source(algo(None))
     imp = "from qall import task, workflow\n"
     for req in requirement:
@@ -136,8 +137,20 @@ def clear_algo():
     cursor.execute("DELETE FROM sqlite_sequence WHERE name='algorithms'")
     cursor.connection.commit()
 
+
 def clear_module():
     cursor.execute("DELETE FROM modules")
     cursor.execute("DELETE FROM sqlite_sequence WHERE name='modules'")
     cursor.connection.commit()
 
+
+def delete_algo(algo_id: int) -> bool:
+    cursor.execute("DELETE FROM algorithms WHERE id = ?", (algo_id,))
+    cursor.connection.commit()
+    return cursor.rowcount > 0
+
+
+def delete_module(module_id: int) -> bool:
+    cursor.execute("DELETE FROM modules WHERE id = ?", (module_id))
+    cursor.connection.commit()
+    return cursor.rowcount > 0

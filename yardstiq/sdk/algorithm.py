@@ -5,9 +5,7 @@ from yardstiq.object.algorithm import Algorithm
 from yardstiq.object.module import Module
 
 
-def algorithm(
-    problem: str = None, version: str = None, local: bool = False
-):
+def algorithm(problem: str, version: str = None, local: bool = False):
     """Algorithm decorator to register an algorithm in the AlgorithmRegistry.
 
     Args:
@@ -18,7 +16,6 @@ def algorithm(
     if version is None or not isinstance(version, str):
         raise TypeError(f"Algorithm must provide a version string.")
 
-    print(local)
     def decorator_algorithm(func: Callable):
 
         @wraps(func)
@@ -32,12 +29,12 @@ def algorithm(
                 )
             return result
 
-
-        name = ":".join([problem, version])
+        name = ":".join([problem, func.__name__, version])
+        version_ = func.__name__ + ":" + version
         algo = Algorithm(
             problem=problem,
             func=wrapper,
-            version=version,
+            version=version_,
             local=local,
             name=name,
         )

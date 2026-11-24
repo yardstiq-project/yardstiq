@@ -32,6 +32,7 @@ def list_module():
             f"Module : name= {module.name}, hash= {module.hash}, tags= {module.tags}"
         )
 
+
 @module_cli.command("clear")
 def clear_modules():
     """Clear all modules registered in Yardstiq"""

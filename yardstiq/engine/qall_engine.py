@@ -19,6 +19,7 @@ from yardstiq.core.ressources import check_hardware_availability, PROVIDER
 
 DISK = BlockRegistry()
 
+
 @engine("qall")
 def qall_engine(workflow: WorkflowInfo) -> WorkflowRun | None:
     """"""
@@ -35,7 +36,7 @@ def qall_engine(workflow: WorkflowInfo) -> WorkflowRun | None:
     if hardware == None:
         typer.echo("Error: Can't find hardware")
         return None
-    
+
     filters = hardware.qpu
     algos = algorithm_database[workflow.instance.problem]
     res = []
@@ -72,7 +73,7 @@ def check_algo_compatibility(algo: Algorithm, q_spec: QpuSpec) -> bool:
 
     def get_task_contraint(node_hash: str) -> None:
         task = DISK.get_node_from_local(node_hash)
-        
+
         for cl, val in task.resources.quantum.to_dict().items():
             if cl not in contraints:
                 contraints[cl] = val
@@ -80,7 +81,7 @@ def check_algo_compatibility(algo: Algorithm, q_spec: QpuSpec) -> bool:
                 contraints[cl] = min(contraints[cl], val)
             elif cl.startswith("min"):
                 contraints[cl] = max(contraints[cl], val)
-        
+
         for child_hash in task.children.values():
             get_task_contraint(child_hash)
 
@@ -95,9 +96,6 @@ def check_algo_compatibility(algo: Algorithm, q_spec: QpuSpec) -> bool:
                 return False
 
     return True
-
-
-
 
 
 def run_new_algo(algo: Algorithm, workflow: WorkflowInfo) -> WorkflowRun:
