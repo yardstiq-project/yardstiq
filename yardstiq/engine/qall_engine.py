@@ -37,7 +37,6 @@ def qall_engine(workflow: WorkflowInfo) -> WorkflowRun | None:
     if hardware == None:
         typer.echo("Error: Can't find hardware")
         return None
-
     filters = hardware.qpu
     algos = algorithm_database[workflow.instance.problem]
     res = []

@@ -53,8 +53,9 @@ def print_resources(local: bool = False):
     else:
         lst = get_local_qpu_resources()
 
-    typer.echo("Resources List")
     typer.echo(f"{'NAME':<30} {'AVAILABILITY':<15} {'PROVIDER NAME':<16} {'TYPE':<12} {'MODALITY':<16} {'TOPOLOGY':<15}")
+
+    lst = sorted(lst, key=lambda r: r.qpu.type.value if r.qpu else "")
 
     for resource in lst:
         if resource.availability == ResourceAvailability.available:
@@ -64,7 +65,7 @@ def print_resources(local: bool = False):
             if resource.qpu:
                 qpu_type = resource.qpu.type.value
                 modality = resource.qpu.modality.value
-                topology = resource.qpu.topology.value
+                topology = resource.qpu.topology.name
             else:
                 qpu_type = modality = topology = "N/A"
 
