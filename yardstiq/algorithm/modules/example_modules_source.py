@@ -47,7 +47,7 @@ def create_circuit(matrix):
 
 
 @module(tags=["local"], local=True)
-def data_loading(n, densite=0.5):
+def data_loading(n: int | None, densite=0.5):
     """
     Génère les données pour un graphe QAOA.
 
@@ -60,6 +60,8 @@ def data_loading(n, densite=0.5):
     import time
 
     content = []
+    if n == None:
+        n = 5
 
     for i in range(n):
         for j in range(i + 1, n):
@@ -82,8 +84,18 @@ def data_loading(n, densite=0.5):
     return data
 
 
-@module(tags=["local"], qall_args={"requirements": []}, local=True)
+@module(tags=["local"],     qall_args={
+        "requirements": ["qiskit", "qiskit-aer"],
+    }, local=True)
 def run_circuit(circuit):
-    results = run(circuit, 10000)
-    counts = results.get_counts()
+    from qiskit.primitives import BackendSamplerV2
+    from qiskit_aer import AerSimulator
+    from qiskit import transpile
+
+    sampler = BackendSamplerV2(backend=AerSimulator())
+    transpiled_circuit = transpile(circuit, backend=AerSimulator())
+    job = sampler.run([transpiled_circuit])
+    result = job.result()
+
+    counts = result[0].data.meas.get_counts()
     return counts

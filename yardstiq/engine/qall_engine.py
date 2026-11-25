@@ -3,13 +3,13 @@ import inspect
 import tempfile
 import traceback
 
-from qall.core import create_workflow_run
+from qall.core import create_workflow_run, run_workflow
 from qall.object.resource import Resource, QpuSpec, QpuModality
 from qall.provider.workflow.local import get_local_qpu_resources
 from qall.registry import BlockRegistry
 from qall.object.task import TaskNode
 from qall.object.resource_contraint import QuantumResourceConstraints
-from qall.core.workflow_run import run_workflow
+from qall.core import run_task
 
 from yardstiq.sdk.engine import engine
 from yardstiq.object import algorithm_database
@@ -56,19 +56,34 @@ def qall_engine(workflow: WorkflowInfo) -> WorkflowRun | None:
     else:
         selected_algo = res[0]
 
-    if selected_algo.hash is None:
-        res = None
+    res = None
+    if selected_algo.hash == None:
         try:
             res = run_new_algo(selected_algo, workflow)
         except Exception as e:
             print(f"Error reason: {e} ")
             traceback.print_exc()
-        return res
+            return None
     else :
-        run_workflow(algo.hash)
-        print("Feature not ready yet")
-    return None
+        try:
+            res = run_hash(selected_algo, workflow)
+        except Exception as e:
+            typer.echo(f"Error: {e}")
+            traceback.print_exc()
+            return None
+    return res
 
+
+def run_hash(algo : Algorithm, workflow : WorkflowInfo) -> WorkflowRun:
+    res = run_task(task_hash=algo.hash)
+    if res:
+        typer.echo(f"Task completed successfully!")
+        typer.echo(f"Output artifacts: {len(res)}")
+
+        for artifact in res:
+            typer.echo(f"  - {artifact.hash}")
+
+    return WorkflowRun(workflow, versions=algo.version, result=res)
 
 def check_algo_compatibility(algo: Algorithm, q_spec: QpuSpec) -> bool:
     """Check if algorithm follows specification of hardware."""
@@ -108,11 +123,11 @@ def run_new_algo(algo: Algorithm, workflow: WorkflowInfo) -> WorkflowRun:
     algo_source = create_source(algo.func(workflow.config))
 
     source = """
-from qall import task, workflow, run
+from qall import task, workflow
+import qiskit
 
 """ + algo_source
-    print(source)
-    return
+    
     version = algo.version
     with tempfile.NamedTemporaryFile(mode="w+", delete=True, suffix=".py") as file:
         file.write(source)
