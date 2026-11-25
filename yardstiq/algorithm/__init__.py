@@ -2,11 +2,11 @@ import importlib
 import pkgutil
 import json
 
-from yardstiq.core.data_base import cursor
+from yardstiq.database.data_base import cursor
 from yardstiq.object.algorithm import Algorithm
 from yardstiq.object import algorithm_database
 
-import yardstiq.algorithm.modules as _
+import yardstiq.modules as _
 
 
 def load_all_algorithms():
@@ -33,7 +33,7 @@ def load_db():
         algo_id, problem, version, algo_hash = row
         name = ":".join([problem, version])
 
-        algo = Algorithm(
+        algorithm = Algorithm(
             problem=problem,
             version=version,
             func=placeholder_qall,
@@ -43,7 +43,7 @@ def load_db():
             id=algo_id,
         )
 
-        algorithm_database.register_algorithm(algo)
+        algorithm_database.register_algorithm(algorithm)
 
 
 load_db()

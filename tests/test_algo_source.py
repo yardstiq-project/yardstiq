@@ -76,4 +76,4 @@ def example_source():
     res = create_matrix(res)
     res = create_circuit(res)
     res = run_circuit(res)
-""", "Simple source algo doesn't mathc expected output"
+""", "Simple source algorithm doesn't mathc expected output"

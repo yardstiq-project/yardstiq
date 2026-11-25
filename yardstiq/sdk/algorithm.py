@@ -1,11 +1,10 @@
-from functools import wraps
 from typing import Callable
-from yardstiq.object import algorithm_database
-from yardstiq.object.algorithm import Algorithm
-from yardstiq.object.module import Module
+
+from yardstiq.object import Algorithm
+from yardstiq.object import Module
 
 
-def algorithm(problem: str, version: str = None, local: bool = False):
+def algorithm(problem: str, version: str = None):
     """Algorithm decorator to register an algorithm in the AlgorithmRegistry.
 
     Args:
@@ -18,7 +17,6 @@ def algorithm(problem: str, version: str = None, local: bool = False):
 
     def decorator_algorithm(func: Callable):
 
-        @wraps(func)
         def wrapper(*args, **kwargs) -> list[Module]:
             result = func(*args, **kwargs)
             if not isinstance(result, list) or not all(
@@ -31,14 +29,13 @@ def algorithm(problem: str, version: str = None, local: bool = False):
 
         name = ":".join([problem, func.__name__, version])
         version_ = func.__name__ + ":" + version
-        algo = Algorithm(
+        algorithm_object = Algorithm(
             problem=problem,
             func=wrapper,
             version=version_,
-            local=local,
             name=name,
         )
-        algorithm_database.register_algorithm(algo)
-        return algo
+        algorithm_object.register()
+        return algorithm_object
 
     return decorator_algorithm

@@ -1,4 +1,4 @@
-from yardstiq.object.instance import Instance
+from .instance import Instance
 from yardstiq.object.config import Config
 from yardstiq.object.dataset import Dataset
 from dataclasses import dataclass
@@ -30,5 +30,5 @@ class WorkflowRun:
     """
 
     workflow: WorkflowInfo
-    versions: dict
+    version: str
     result: any

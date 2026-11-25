@@ -1,7 +1,7 @@
-from typing import Callable
-from yardstiq.object import module_database
-from yardstiq.object.module import Module
 import inspect
+from typing import Callable
+
+from yardstiq.object.module import Module
 
 
 def module(
@@ -23,7 +23,7 @@ def module(
     def decorator_module(func: Callable):
         module_name = name if name else func.__name__
         path = inspect.getsourcefile(func)
-        mod = Module(
+        module = Module(
             name=module_name,
             function=func,
             local=local,
@@ -32,7 +32,7 @@ def module(
             version=version,
             tags=tags,
         )
-        module_database.register_module(mod)
-        return mod
+        module.register()
+        return module
 
     return decorator_module

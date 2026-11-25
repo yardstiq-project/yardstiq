@@ -6,12 +6,7 @@ from yardstiq.object import engine_database
 
 
 def engine(name: str = None):
-    """engine decorator to register an engine in the EngineRegistry. It can be used with or without parameters.
-
-    Args:
-        func_or_name (callable or str, optional): The function to be decorated, OR the name of the engine.
-        **kwargs: Additional keyword arguments to be passed to the engine function.
-    """
+    """ """
 
     def decorator_engine(func: Callable):
         """decorator function to register an engine in the EngineRegistry."""

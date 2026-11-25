@@ -35,7 +35,7 @@ def run(
         False,
         "--estimate",
         "-e",
-        help="Option to prevent from running problem and estimate ressources cost",
+        help="Option to prevent from running problem and estimate resources cost",
     ),
     engine: Optional[str] = typer.Option(
         "qall",

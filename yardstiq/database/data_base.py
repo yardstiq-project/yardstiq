@@ -6,7 +6,7 @@ from yardstiq.object import module_database, algorithm_database
 import importlib
 import os
 import tempfile
-from .create_source import create_task, create_source
+from ..core.create_source import create_task, create_source
 import sys
 
 LOCAL_DB = "local_ys.db"
@@ -44,17 +44,17 @@ def register_algo(file_path: str, name: str, requirement: list[str] = None):
     module_name = os.path.splitext(os.path.basename(file_path))[0]
     spec = importlib.util.spec_from_file_location(module_name, file_path)
     if spec is None or spec.loader is None:
-        raise ImportError(f"Impossible de charger le fichier : {file_path}")
+        raise ImportError(f"Unable to load file : : {file_path}")
     module = importlib.util.module_from_spec(spec)
     sys.modules[module_name] = module
     spec.loader.exec_module(module)
 
     if algorithm_database[name] == None:
         return
-    algo = algorithm_database[name][-1]
+    algorithm = algorithm_database[name][-1]
 
-    algo_source = create_source(algo(None))
-    imp = "from qall import task, workflow\n"
+    algo_source = create_source(algorithm(None))
+    imp = "from qall import task, workflow\nimport qiskit\n"
     for req in requirement:
         imp += f"import {req}\n"
 
@@ -71,14 +71,14 @@ def register_algo(file_path: str, name: str, requirement: list[str] = None):
         work = WorkflowSpec(file.name)
         tag, dag = push_workflow_on_registry(
             workflow_spec=work,
-            workflow_name=algo.problem,
+            workflow_name=algorithm.problem,
             local_only=True,
-            workflow_version=algo.version,
+            workflow_version=algorithm.version,
         )
 
         cursor.execute(
             "INSERT INTO algorithms (problem, version, hash) VALUES (?, ?, ?)",
-            (algo.problem, algo.version, dag.root_hash),
+            (algorithm.problem, algorithm.version, dag.root_hash),
         )
         cursor.connection.commit()
 
@@ -93,7 +93,7 @@ def register_module(file_path: str = None, requirement: list[str] = None):
     module_name = os.path.splitext(os.path.basename(file_path))[0]
     spec = importlib.util.spec_from_file_location(module_name, file_path)
     if spec is None or spec.loader is None:
-        raise ImportError(f"Impossible de charger le fichier : {file_path}")
+        raise ImportError(f"Unable to load file : : {file_path}")
     module = importlib.util.module_from_spec(spec)
     sys.modules[module_name] = module
     spec.loader.exec_module(module)

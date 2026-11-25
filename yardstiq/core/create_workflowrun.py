@@ -1,6 +1,5 @@
 from yardstiq.object.workflow import WorkflowInfo, WorkflowRun
-from yardstiq.object import engine_database
-
+from yardstiq.engine import Qall
 
 def create_workflowrun(workflow_info: WorkflowInfo, engine: str) -> WorkflowRun:
     """Function that take a workflow and uses a engine to run it.
@@ -9,6 +8,6 @@ def create_workflowrun(workflow_info: WorkflowInfo, engine: str) -> WorkflowRun:
 
     """
 
-    WorkflowRun = engine_database[engine](workflow_info)
+    WorkflowRun = Qall.run_workflowinfo(workflow_info)
 
     return WorkflowRun

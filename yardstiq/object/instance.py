@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from .config import Config
 import typer
 
-PROBLEM_LIST = ["maxcut", "tsp", "vqe", "exemple_algorithm"]
+PROBLEM_LIST = ["maxcut", "tsp", "vqe", "exemple_algorithm", "sample_algo"]
 
 
 @dataclass(frozen=True)

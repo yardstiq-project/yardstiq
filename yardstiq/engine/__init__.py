@@ -1,5 +1,6 @@
 import importlib
 import pkgutil
+from .qall_engine import Qall
 
 
 def load_all_engines():

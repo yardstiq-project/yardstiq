@@ -2,6 +2,7 @@ import typer
 import qall
 
 from yardstiq.core.provider import login_provider_ys, logout_provider_ys
+from .utils import parse_extra_args
 from typing import Optional
 
 provider_cli = typer.Typer(
@@ -82,7 +83,6 @@ def login(
             raise typer.Exit(code=1)
 
 
-
 @provider_cli.command("logout")
 def logout():
     old_provider = logout_provider_ys()
@@ -91,47 +91,3 @@ def logout():
         typer.echo(f"Dropped provider credentials successfully from {old_provider}")
     else:
         typer.echo(f"Already logout")
-
-
-def parse_extra_args(args: list[str]) -> dict[str, str]:
-    """
-    Parses arbitrary extra CLI option flags into a clean Python dictionary.
-    Handles '--key=value', '--key value', and standalone boolean flags.
-    Normalizes keys by removing leading dashes and replacing hyphens with underscores.
-
-    Example:
-        ['--project-id=123', '--secret-key', 'abc', '--verbose']
-        -> {'project_id': '123', 'secret_key': 'abc', 'verbose': 'true'}
-    """
-    extra_dict = {}
-    i = 0
-
-    while i < len(args):
-        arg = args[i]
-
-        if arg.startswith("--"):
-            # Clean the prefix and prepare the key
-            clean_arg = arg.lstrip("-")
-
-            if "=" in clean_arg:
-                # Case A: Syntax option is '--key=value'
-                key, val = clean_arg.split("=", 1)
-                extra_dict[key.replace("-", "_")] = val
-                i += 1
-            else:
-                # Case B: Syntax option is '--key value' or standalone flag
-                key = clean_arg.replace("-", "_")
-
-                # Check if the next argument exists and is a value (not another flag)
-                if i + 1 < len(args) and not args[i + 1].startswith("-"):
-                    extra_dict[key] = args[i + 1]
-                    i += 2
-                else:
-                    # Fallback flag default value if standalone
-                    extra_dict[key] = "true"
-                    i += 1
-        else:
-            # Skip invalid positions or unformatted extra strings
-            i += 1
-
-    return extra_dict

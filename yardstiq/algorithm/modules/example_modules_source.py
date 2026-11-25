@@ -84,9 +84,13 @@ def data_loading(n: int | None, densite=0.5):
     return data
 
 
-@module(tags=["local"],     qall_args={
+@module(
+    tags=["local"],
+    qall_args={
         "requirements": ["qiskit", "qiskit-aer"],
-    }, local=True)
+    },
+    local=True,
+)
 def run_circuit(circuit):
     from qiskit.primitives import BackendSamplerV2
     from qiskit_aer import AerSimulator

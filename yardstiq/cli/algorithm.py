@@ -1,16 +1,16 @@
 import typer
 
-from yardstiq.core.data_base import register_algo, clear_algo, delete_algo
+from yardstiq.database.data_base import register_algo, clear_algo, delete_algo
 from yardstiq.object import algorithm_database
 from yardstiq.object.algorithm import Algorithm
 
 algo_cli = typer.Typer(
-    name="algo", help="Yardstiq's algorithm CLI", no_args_is_help=True
+    name="algorithm", help="Yardstiq's algorithm CLI", no_args_is_help=True
 )
 
 
 @algo_cli.command("add")
-def algo(
+def algorithm_add(
     problem: str = typer.Argument(..., help="Name of the problem to import"),
     path: str = typer.Argument(..., help="Path to the file containing the problem"),
     req: list[str] = typer.Option(
@@ -26,11 +26,11 @@ def list_algo():
     """List all algorithms registered in Yardstiq"""
     lst = algorithm_database.get_algorithms()
     typer.echo("List of algorithms registered:")
-    for problem, algos in lst.items():
+    for problem, algorithms in lst.items():
         typer.echo(f"\nAlgorithm type : {problem}")
         typer.echo(f"{'ID':<18} {'NAME':<34} {'HASH'}")
-        for algo in algos:
-            typer.echo(f"{str(algo.id):<18} {algo.name:<34} {algo.hash}")
+        for algorithm in algorithms:
+            typer.echo(f"{str(algorithm.id):<18} {algorithm.name:<34} {algorithm.hash}")
 
 
 @algo_cli.command("clear")
@@ -45,6 +45,6 @@ def clear_algos(
 ):
     """Clear specific algorithm registered in Yardstiq"""
     if not delete_algo(id):
-        typer.echo(f"Warning: can't delete algo with id : {id}")
+        typer.echo(f"Warning: can't delete algorithm with id : {id}")
     else:
-        typer.echo(f"Successfully removed algo : {id}")
+        typer.echo(f"Successfully removed algorithm : {id}")

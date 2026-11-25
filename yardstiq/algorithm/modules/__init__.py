@@ -2,7 +2,7 @@ import importlib
 import pkgutil
 import json
 
-from yardstiq.core.data_base import cursor
+from yardstiq.database.data_base import cursor
 from yardstiq.object.module import Module
 from yardstiq.object import module_database
 

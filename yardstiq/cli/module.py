@@ -1,8 +1,8 @@
 import typer
-from yardstiq.core.data_base import register_module, clear_module
+from yardstiq.database.data_base import register_module, clear_module
 from yardstiq.object import module_database
-from yardstiq.core.data_base import cursor
-from yardstiq.algorithm.modules import load_db
+from yardstiq.database.data_base import cursor
+from yardstiq.modules import load_db
 from yardstiq.object.module import Module
 
 module_cli = typer.Typer(

@@ -66,7 +66,7 @@ def create_workflow(
 
 def create_source(
     modules: list[Module],
-):
+) -> str:
     func_defs = []
     core_lines = [
         "@workflow(requirements=['qiskit', 'numpy'])",

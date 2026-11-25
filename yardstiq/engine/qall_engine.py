@@ -1,149 +1,150 @@
-import typer
-import inspect
+import logging
 import tempfile
-import traceback
+import textwrap
 
-from qall.core import create_workflow_run, run_workflow
-from qall.object.resource import Resource, QpuSpec, QpuModality
+from qall.core import create_workflow_run, run_task
+from qall.object.resource import QpuSpec, Resource
 from qall.provider.workflow.local import get_local_qpu_resources
 from qall.registry import BlockRegistry
-from qall.object.task import TaskNode
-from qall.object.resource_contraint import QuantumResourceConstraints
-from qall.core import run_task
-
-from yardstiq.sdk.engine import engine
-from yardstiq.object import algorithm_database
-from yardstiq.object.algorithm import Algorithm
-from yardstiq.object.workflow import WorkflowRun, WorkflowInfo
 from yardstiq.core.create_source import create_source
-from yardstiq.core.ressources import check_hardware_availability, PROVIDER
+from yardstiq.core.resources import WorkflowProviderClient, log_to_provider
+from yardstiq.object import Algorithm, Engine
+from yardstiq.object.workflow import WorkflowInfo, WorkflowRun
+from yardstiq.registry import algorithm_database
 
+logger = logging.getLogger(__name__)
 DISK = BlockRegistry()
 
 
-@engine("qall")
-def qall_engine(workflow: WorkflowInfo) -> WorkflowRun | None:
-    """"""
+class Qall(Engine):
+    name: str = "qall"
 
-    if workflow.local == False:
-        if PROVIDER == None:
-            print("Error: no connection to provider")
-            return
-        ressources = PROVIDER.list_resources()
-    else:
-        ressources = get_local_qpu_resources()
+    @classmethod
+    def run_workflowinfo(cls, workflow: WorkflowInfo) -> WorkflowRun | None:
+        provider = log_to_provider()
 
-    hardware = check_hardware_availability(workflow.config.hardware, ressources)
-    if hardware == None:
-        typer.echo("Error: Can't find hardware")
-        return None
-    filters = hardware.qpu
-    algos = algorithm_database[workflow.instance.problem]
-    res = []
-    for algo in algos:
-        if check_algo_compatibility(algo, filters):
-            res.append(algo)
-
-    s = len(res)
-    if s == 0:
-        print(
-            f"Error: No algorithms found to run {workflow.instance.problem} on {workflow.config.hardware}"
-        )
-        return None
-    elif s > 1:
-        selected_algo = res[0]
-    else:
-        selected_algo = res[0]
-
-    res = None
-    if selected_algo.hash == None:
         try:
-            res = run_new_algo(selected_algo, workflow)
+            resources = cls._get_resources(workflow.local, provider)
+            resource = cls._check_availability(workflow.config.hardware, resources)
+            algorithm = cls._get_algorithm(workflow.instance.problem, resource.qpu)
         except Exception as e:
-            print(f"Error reason: {e} ")
-            traceback.print_exc()
+            logger.error("Failed to prepare workflow execution: %s", e)
             return None
-    else :
+
         try:
-            res = run_hash(selected_algo, workflow)
-        except Exception as e:
-            typer.echo(f"Error: {e}")
-            traceback.print_exc()
+            if not algorithm.hash:
+                return cls._run_algorithm_source(algorithm, workflow)
+            return cls._run_algorithm_hash(algorithm, workflow)
+        except Exception:
+            logger.exception("Failed to execute algorithm %s", algorithm.version)
             return None
-    return res
 
+    @classmethod
+    def _get_algorithm(cls, problem: str, filters: QpuSpec) -> Algorithm:
+        algorithms = algorithm_database[problem]
+        compatible_algos = [
+            algo for algo in algorithms if cls._check_algo_compatibility(algo, filters)
+        ]
 
-def run_hash(algo : Algorithm, workflow : WorkflowInfo) -> WorkflowRun:
-    res = run_task(task_hash=algo.hash)
-    if res:
-        typer.echo(f"Task completed successfully!")
-        typer.echo(f"Output artifacts: {len(res)}")
+        if not compatible_algos:
+            raise LookupError(
+                f"No algorithms found to run '{problem}' on '{filters.model_name}'"
+            )
 
-        for artifact in res:
-            typer.echo(f"  - {artifact.hash}")
+        return compatible_algos[0]
 
-    return WorkflowRun(workflow, versions=algo.version, result=res)
+    @staticmethod
+    def _check_availability(
+        hardware: str,
+        resources: list[Resource],
+    ) -> Resource:
+        matching = [res for res in resources if res.name == hardware]
 
-def check_algo_compatibility(algo: Algorithm, q_spec: QpuSpec) -> bool:
-    """Check if algorithm follows specification of hardware."""
-    contraints = {}
+        if not matching:
+            raise LookupError(f"Hardware '{hardware}' not found in provider resources")
+        if len(matching) > 1:
+            raise ValueError(
+                f"Multiple resources found for '{hardware}'. Please adjust filters."
+            )
+        return matching[0]
 
-    def get_task_contraint(node_hash: str) -> None:
-        task = DISK.get_node_from_local(node_hash)
+    @staticmethod
+    def _get_resources(
+        local: bool, provider: WorkflowProviderClient | None
+    ) -> list[Resource]:
+        if local:
+            return get_local_qpu_resources()
+        if not provider:
+            raise ConnectionError("Provider client is required for remote execution")
+        return provider.list_resources()
 
-        for cl, val in task.resources.quantum.to_dict().items():
-            if cl not in contraints:
-                contraints[cl] = val
-            elif cl.startswith("max"):
-                contraints[cl] = min(contraints[cl], val)
-            elif cl.startswith("min"):
-                contraints[cl] = max(contraints[cl], val)
+    @staticmethod
+    def _run_algorithm_hash(
+        algorithm: Algorithm, workflow: WorkflowInfo
+    ) -> WorkflowRun:
+        res = run_task(task_hash=algorithm.hash)
+        if res:
+            print("Task completed successfully!")
+            print(f"Output artifacts: {len(res)}")
+            for artifact in res:
+                print(f"  - {artifact.hash}")
 
-        for child_hash in task.children.values():
-            get_task_contraint(child_hash)
+        return WorkflowRun(workflow, version=algorithm.version, result=res)
 
-    if algo.hash == None:
+    @staticmethod
+    def _run_algorithm_source(
+        algorithm: Algorithm, workflow: WorkflowInfo
+    ) -> WorkflowRun:
+        algo_source = create_source(algorithm.func(workflow.config))
+        header = textwrap.dedent("""\
+            from qall import task, workflow
+            import qiskit
+
+        """)
+
+        with tempfile.NamedTemporaryFile(mode="w+", suffix=".py") as file:
+            file.write(header + algo_source)
+            file.flush()
+
+            run_obj = create_workflow_run(
+                entrypoint=file.name,
+                local_only=True,
+                allowed_qpus=[workflow.config.hardware],
+                auto_start_daemon=True,
+            )
+
+        return WorkflowRun(workflow, version=algorithm.version, result=run_obj)
+
+    @staticmethod
+    def _check_algo_compatibility(algorithm: Algorithm, q_spec: QpuSpec) -> bool:
+        """Check if algorithm constraints are satisfied by the hardware specification."""
+        if algorithm.hash is None:
+            return True
+
+        constraints: dict[str, int | float] = {}
+
+        def collect_constraints(node_hash: str) -> None:
+            task = DISK.get_node_from_local(node_hash)
+            for key, val in task.resources.quantum.to_dict().items():
+                if key not in constraints:
+                    constraints[key] = val
+                elif key.startswith("max"):
+                    constraints[key] = min(constraints[key], val)
+                elif key.startswith("min"):
+                    constraints[key] = max(constraints[key], val)
+
+            for child_hash in task.children.values():
+                collect_constraints(child_hash)
+
+        collect_constraints(algorithm.hash)
+
+        for key, limit in constraints.items():
+            spec_val = getattr(q_spec, key, None)
+            if spec_val is None:
+                continue
+            if key.startswith("max") and spec_val > limit:
+                return False
+            if key.startswith("min") and spec_val < limit:
+                return False
+
         return True
-    get_task_contraint(algo.hash)
-
-    for key, val in contraints.items():
-        if hasattr(q_spec, key):
-            elem = getattr(q_spec, key)
-            if key.startswith("max") and elem > val:
-                return False
-            if key.startswith("min") and elem < val:
-                return False
-
-    return True
-
-
-def run_new_algo(algo: Algorithm, workflow: WorkflowInfo) -> WorkflowRun:
-
-    algo_source = create_source(algo.func(workflow.config))
-
-    source = """
-from qall import task, workflow
-import qiskit
-
-""" + algo_source
-    
-    version = algo.version
-    with tempfile.NamedTemporaryFile(mode="w+", delete=True, suffix=".py") as file:
-        file.write(source)
-
-        file.flush()
-
-        run_obj = create_workflow_run(
-            entrypoint=file.name,
-            workflow_name=None,
-            workflow_version=None,
-            profile_name=None,
-            local_only=True,
-            input_artifact_hash=None,
-            allowed_cpus=None,
-            allowed_gpus=None,
-            allowed_qpus=[workflow.config.hardware],
-            auto_start_daemon=True,
-        )
-
-    return WorkflowRun(workflow, version, run_obj)
