@@ -1,3 +1,5 @@
+import typer
+
 from qall.object.resource import ResourceAvailability, Resource
 from qall.provider.workflow import get_provider_client_by_name
 from qall.provider.workflow.provider_client import WorkflowProviderClient
@@ -30,32 +32,40 @@ def check_hardware_availability(
 
     s = len(res)
     if s == 0:
-        print("Error: no hardware found in provider resources")
+        typer.echo("Error: no hardware found in provider resources")
         return None
     elif s > 1:
-        print(
+        typer.echo(
             "Error: multiple hardwares found in provider resources. Please adjust filters"
         )
         return None
     return res[0]
 
 
-def print_ressoures(local: bool = False):
-    """Prints all ressources available from provider"""
+def print_resources(local: bool = False):
+    """Prints all resources available from provider"""
 
     if not local:
-        if PROVIDER == None:
-            print("Can't connect to provider")
+        if PROVIDER is None:
+            typer.echo("Can't connect to provider")
             return
         lst = PROVIDER.list_resources()
     else:
         lst = get_local_qpu_resources()
 
-    for ressource in lst:
-        if ressource.availability == ResourceAvailability.available:
-            print(ressource.name)
-            print(ressource.availability)
-            print(ressource.provider)
-            print(ressource.price)
-            print(ressource.qpu)
-            print("\n")
+    typer.echo("Resources List")
+    typer.echo(f"{'NAME':<30} {'AVAILABILITY':<15} {'PROVIDER NAME':<16} {'TYPE':<12} {'MODALITY':<16} {'TOPOLOGY':<15}")
+
+    for resource in lst:
+        if resource.availability == ResourceAvailability.available:
+            avail = resource.availability.value
+            prov = str(resource.provider)
+            
+            if resource.qpu:
+                qpu_type = resource.qpu.type.value
+                modality = resource.qpu.modality.value
+                topology = resource.qpu.topology.value
+            else:
+                qpu_type = modality = topology = "N/A"
+
+            typer.echo(f"{resource.name:<30} {avail:<15} {prov:<16} {qpu_type:<12} {modality:<16} {topology:<15}")
