@@ -2,6 +2,7 @@ from typing import Callable
 
 from yardstiq.object import Algorithm
 from yardstiq.object import Module
+from yardstiq.registry import register_algorithm
 
 
 def algorithm(problem: str, version: str = None):
@@ -35,7 +36,7 @@ def algorithm(problem: str, version: str = None):
             version=version_,
             name=name,
         )
-        algorithm_object.register()
+        register_algorithm(algorithm_object)
         return algorithm_object
 
     return decorator_algorithm

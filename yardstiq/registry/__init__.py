@@ -1,6 +1,7 @@
-from .algorithm import AlgorithmRegistry
-from .module import ModuleRegistry
+from .algorithm import algorithm_database, register_algorithm
+from .module import module_database, register_module
 
-module_database: ModuleRegistry = ModuleRegistry()
-algorithm_database: AlgorithmRegistry = AlgorithmRegistry()
+import yardstiq.algorithm
+import yardstiq.modules
+
 # engine_database: EngineRegistry = EngineRegistry()

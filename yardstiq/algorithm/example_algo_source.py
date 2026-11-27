@@ -1,4 +1,4 @@
-from yardstiq.object import module_database
+from yardstiq.registry import module_database
 from yardstiq.sdk.algorithm import algorithm
 
 from qall.object.resource import QpuModality, QpuTopology
@@ -7,7 +7,6 @@ from qall.object.resource import QpuModality, QpuTopology
 @algorithm(
     problem="exemple_algorithm",
     version="1.0.0",
-    local=True,
 )
 def example_source(_):
     """ """

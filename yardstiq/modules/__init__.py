@@ -4,7 +4,7 @@ import json
 
 from yardstiq.database.data_base import cursor
 from yardstiq.object.module import Module
-from yardstiq.object import module_database
+from yardstiq.registry import module_database
 
 
 def load_all_algorithms():

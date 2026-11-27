@@ -4,7 +4,7 @@ import json
 
 from yardstiq.database.data_base import cursor
 from yardstiq.object.algorithm import Algorithm
-from yardstiq.object import algorithm_database
+from yardstiq.registry import algorithm_database
 
 import yardstiq.modules as _
 
@@ -38,7 +38,6 @@ def load_db():
             version=version,
             func=placeholder_qall,
             hash=algo_hash,
-            local=True,
             name=name,
             id=algo_id,
         )

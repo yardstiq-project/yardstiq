@@ -1,7 +1,6 @@
 from typing import Callable
 from dataclasses import dataclass, field
 from typing import Optional
-from yardstiq.registry import module_database
 
 
 @dataclass(frozen=True)
@@ -21,6 +20,3 @@ class Module:
 
     def __call__(self, *args, **kwargs):
         return self.function(*args, **kwargs)
-
-    def register(self):
-        module_database.register_module(self)

@@ -4,7 +4,7 @@ import textwrap
 
 from qall.core import create_workflow_run, run_task
 from qall.object.resource import QpuSpec, Resource
-from qall.provider.workflow.local import get_local_qpu_resources
+from qall.provider.workflow.local.local_provider import LocalWorkflowProviderClient
 from qall.registry import BlockRegistry
 from yardstiq.core.create_source import create_source
 from yardstiq.core.resources import WorkflowProviderClient, log_to_provider
@@ -14,6 +14,7 @@ from yardstiq.registry import algorithm_database
 
 logger = logging.getLogger(__name__)
 DISK = BlockRegistry()
+LOCAL_RESOURCES = LocalWorkflowProviderClient()
 
 
 class Qall(Engine):
@@ -73,7 +74,7 @@ class Qall(Engine):
         local: bool, provider: WorkflowProviderClient | None
     ) -> list[Resource]:
         if local:
-            return get_local_qpu_resources()
+            return LOCAL_RESOURCES.list_quantum_resources()
         if not provider:
             raise ConnectionError("Provider client is required for remote execution")
         return provider.list_resources()

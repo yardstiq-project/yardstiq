@@ -1,9 +1,10 @@
 import typer
+from yardstiq.registry import module_database
+
+from .utils import load_file, get_import_modules
+from yardstiq.registry.push_qall import push_module_qall
+
 from yardstiq.database.data_base import register_module, clear_module
-from yardstiq.object import module_database
-from yardstiq.database.data_base import cursor
-from yardstiq.modules import load_db
-from yardstiq.object.module import Module
 
 module_cli = typer.Typer(
     name="module", help="Yardstiq's modules CLI", no_args_is_help=True
@@ -13,12 +14,23 @@ module_cli = typer.Typer(
 @module_cli.command("add")
 def module(
     path: str = typer.Argument(..., help="Path to the file containing the module(s)"),
-    req: list[str] = typer.Option(
+    requirement: list[str] = typer.Option(
         [], "--requirement", "-r", help="Depedencies needed to execute module(s)"
     ),
 ):
     """Add a module to YS"""
-    register_module(path, req)
+    try:
+        folder = load_file(path)
+    except Exception as e:
+        return typer.echo(f"Error : {e}")
+
+    modules = get_import_modules()
+    if not modules or len(modules) == 0:
+        return typer.echo(f"Error: No modules found in file {path}")
+
+    for module in modules:
+        hash = push_module_qall(folder, module, requirement)
+        register_module(module, hash)
 
 
 @module_cli.command("ls")

@@ -58,3 +58,11 @@ class AlgorithmRegistry:
 
     def clear(cls):
         cls._algorithms = {}
+
+
+algorithm_database: AlgorithmRegistry = AlgorithmRegistry()
+
+
+def register_algorithm(algorithm: Algorithm) -> bool:
+    algorithm_database.register_algorithm(algorithm)
+    return True

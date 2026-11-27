@@ -17,5 +17,8 @@ def list_resources(
     """Prints all resources available"""
 
     lst = list_provider_resources(local)
+    if not lst:
+        typer.echo("Error: No resources found")
+        return
     lst_str = list_ressource_str(lst)
     typer.echo(lst_str)

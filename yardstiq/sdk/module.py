@@ -2,6 +2,7 @@ import inspect
 from typing import Callable
 
 from yardstiq.object.module import Module
+from yardstiq.registry import register_module
 
 
 def module(
@@ -32,7 +33,7 @@ def module(
             version=version,
             tags=tags,
         )
-        module.register()
+        register_module(module)
         return module
 
     return decorator_module

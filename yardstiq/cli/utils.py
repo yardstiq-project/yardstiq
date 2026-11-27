@@ -1,7 +1,16 @@
 import typer
+import os
+import importlib
+import sys
+from qall.core.registry import WorkflowSpec
+
+
 from yardstiq.object.config import Config
+from yardstiq.object import Algorithm, Module
+
 from typing import Optional
 from qall.object.resource import Resource, ResourceAvailability
+from yardstiq.registry import algorithm_database, module_database
 
 
 def create_config(raw: Optional[str], qpu: str) -> Config:
@@ -75,7 +84,7 @@ def parse_extra_args(args: list[str]) -> dict[str, str]:
 
 
 def list_ressource_str(lst: list[Resource]) -> str:
-    lst_str = f"{'NAME':<30} {'AVAILABILITY':<15} {'PROVIDER NAME':<16} {'TYPE':<12} {'MODALITY':<16} {'TOPOLOGY':<15}"
+    lst_str = f"{'NAME':<30} {'AVAILABILITY':<15} {'PROVIDER NAME':<16} {'TYPE':<12} {'MODALITY':<16} {'TOPOLOGY':<15}\n"
 
     lst = sorted(lst, key=lambda r: r.qpu.type.value if r.qpu else "")
 
@@ -91,5 +100,27 @@ def list_ressource_str(lst: list[Resource]) -> str:
             else:
                 qpu_type = modality = topology = "N/A"
 
-            lst_str += f"{resource.name:<30} {avail:<15} {prov:<16} {qpu_type:<12} {modality:<16} {topology:<15}"
+            lst_str += f"{resource.name:<30} {avail:<15} {prov:<16} {qpu_type:<12} {modality:<16} {topology:<15}\n"
     return lst_str
+
+
+def load_file(file_path: str) -> str:
+
+    module_name = os.path.splitext(os.path.basename(file_path))[0]
+    spec = importlib.util.spec_from_file_location(module_name, file_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Unable to load file : : {file_path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)
+    return os.path.dirname(file_path)
+
+
+def get_import_algorithm(problem: str) -> Algorithm | None:
+    if algorithm_database[problem] == None:
+        return None
+    return algorithm_database[problem][-1]
+
+
+def get_import_modules() -> list[Module]:
+    return module_database.get_non_local()

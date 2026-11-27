@@ -35,3 +35,11 @@ class ModuleRegistry:
 
     def get_non_local(cls) -> list[Module]:
         return [module for module in cls._modules.values() if module.local == False]
+
+
+module_database: ModuleRegistry = ModuleRegistry()
+
+
+def register_module(module: Module) -> bool:
+    module_database.register_module(module)
+    return True

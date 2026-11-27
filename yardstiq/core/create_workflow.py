@@ -13,14 +13,4 @@ def create_workflow_info(
 ) -> WorkflowInfo:
     """Function that checks availability of the dataset and"""
 
-    # Check QPU/EMU availability
-    # Check dataset availability
-    # Check compatibility
-
-    # To replace with Aqora API
-    file = Path(instance.dataset)
-    if not file.is_file():
-        raise FileNotFoundError("Dataset file not found")
-    #
-
     return WorkflowInfo(instance, config, local)

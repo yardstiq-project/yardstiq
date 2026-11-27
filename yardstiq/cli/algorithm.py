@@ -1,8 +1,9 @@
 import typer
 
 from yardstiq.database.data_base import register_algo, clear_algo, delete_algo
-from yardstiq.object import algorithm_database
-from yardstiq.object.algorithm import Algorithm
+from .utils import load_file, get_import_algorithm
+from yardstiq.registry import algorithm_database
+from yardstiq.registry.push_qall import push_algorithm_qall
 
 algo_cli = typer.Typer(
     name="algorithm", help="Yardstiq's algorithm CLI", no_args_is_help=True
@@ -13,12 +14,22 @@ algo_cli = typer.Typer(
 def algorithm_add(
     problem: str = typer.Argument(..., help="Name of the problem to import"),
     path: str = typer.Argument(..., help="Path to the file containing the problem"),
-    req: list[str] = typer.Option(
+    requirement: list[str] = typer.Option(
         [], "--requirement", "-r", help="Depedencies needed to execute module(s)"
     ),
 ):
     """Import algorithms to YS"""
-    register_algo(path, problem, req)
+    try:
+        folder = load_file(path)
+    except Exception as e:
+        return typer.echo(f"Error : {e}")
+
+    algorithm = get_import_algorithm(problem)
+    if not algorithm:
+        return typer.echo(f"Error: No algorithms found under problem {problem}")
+
+    hash = push_algorithm_qall(folder, algorithm, requirement)
+    register_algo(algorithm, hash)
 
 
 @algo_cli.command("ls")
