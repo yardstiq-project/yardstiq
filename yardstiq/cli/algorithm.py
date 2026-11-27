@@ -22,14 +22,17 @@ def algorithm_add(
     try:
         folder = load_file(path)
     except Exception as e:
-        return typer.echo(f"Error : {e}")
+        typer.echo(f"Error : {e}")
+        return
 
     algorithm = get_import_algorithm(problem)
     if not algorithm:
-        return typer.echo(f"Error: No algorithms found under problem {problem}")
+        typer.echo(f"Error: No algorithms found under problem {problem}")
+        return
 
     hash = push_algorithm_qall(folder, algorithm, requirement)
     register_algo(algorithm, hash)
+    typer.echo(f"Successfully added {algorithm.name} to local database")
 
 
 @algo_cli.command("ls")
@@ -39,9 +42,9 @@ def list_algo():
     typer.echo("List of algorithms registered:")
     for problem, algorithms in lst.items():
         typer.echo(f"\nAlgorithm type : {problem}")
-        typer.echo(f"{'ID':<18} {'NAME':<34} {'HASH'}")
+        typer.echo(f"{'ID':<18} {'NAME':<50} {'HASH'}")
         for algorithm in algorithms:
-            typer.echo(f"{str(algorithm.id):<18} {algorithm.name:<34} {algorithm.hash}")
+            typer.echo(f"{str(algorithm.id):<18} {algorithm.name:<50} {algorithm.hash}")
 
 
 @algo_cli.command("clear")

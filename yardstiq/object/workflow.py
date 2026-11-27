@@ -2,6 +2,7 @@ from .instance import Instance
 from yardstiq.object.config import Config
 from yardstiq.object.dataset import Dataset
 from dataclasses import dataclass
+from qall.object.workflow_run import WorkflowRun
 
 
 @dataclass(frozen=True)
@@ -31,4 +32,4 @@ class WorkflowRun:
 
     workflow: WorkflowInfo
     version: str
-    result: any
+    result: tuple[WorkflowRun, list | None]

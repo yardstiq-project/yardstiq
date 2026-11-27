@@ -22,15 +22,18 @@ def module(
     try:
         folder = load_file(path)
     except Exception as e:
-        return typer.echo(f"Error : {e}")
+        typer.echo(f"Error : {e}")
+        return
 
     modules = get_import_modules()
     if not modules or len(modules) == 0:
-        return typer.echo(f"Error: No modules found in file {path}")
+        typer.echo(f"Error: No modules found in file {path}")
+        return
 
     for module in modules:
         hash = push_module_qall(folder, module, requirement)
         register_module(module, hash)
+        typer.echo(f"Successfully added {module.name} to local database")
 
 
 @module_cli.command("ls")

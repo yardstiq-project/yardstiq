@@ -73,6 +73,13 @@ def run(
 
     workflow_run = create_workflowrun(workflow_info, engine)
     debug_print(f"Workflowrun executed : {workflow_run}", debug)
-
+    if not workflow_run:
+        typer.echo(
+            "Error: error while running workflow. Please see above reason if any"
+        )
+        return
+    typer.echo("Workflow successfully run.")
+    for artefact in workflow_run.result[1]:
+        typer.echo(f"---- Artefact : {artefact.hash}")
     # submission manager part
     debug_print(f"Workflowrun executed : {workflow_run}", debug)
